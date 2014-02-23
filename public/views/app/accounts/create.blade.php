@@ -36,7 +36,6 @@
 		<div class="panel-heading">
 			<span class="glyphicon glyphicon-collapse-up pull-right"></span>
 			<h3 class="panel-title">General</h3>
-
 		</div>
 		<div class="panel-body collapse in">
 
@@ -200,17 +199,17 @@
 				</div>
 
 				<!-- Activation Status -->
-				<div class="form-group {{ $errors->has('activate') ? 'has-error' : '' }}">
-					{{ Form::label('activate', Lang::get('accounts/messages.create.activate'),
+				<div class="form-group {{ $errors->has('activated') ? 'has-error' : '' }}">
+					{{ Form::label('activated', Lang::get('accounts/messages.create.activated'),
 					array('class' => 'control-label col-md-12')) }}
 					<div class="col-md-12">
-						{{ Form::select('activate', array('0'=>Lang::get('general.no'),'1'=>Lang::get('general.yes')), Input::old('activate', 0), array('class'=>'form-control')) }}
+						{{ Form::select('activated', array('0'=>Lang::get('general.no'),'1'=>Lang::get('general.yes')), Input::old('activated', 0), array('class'=>'form-control')) }}
 					</div>
 					<div class="col-md-6">
 						<label class="control-label"></label>
 					</div>
 					<div class="col-md-24">
-						<span class="help-block">{{ $errors->first('activate') }}</span>
+						<span class="help-block">{{ $errors->first('activated') }}</span>
 					</div>
 				</div>
 
@@ -236,7 +235,7 @@
 					array('class' => 'control-label col-md-12')) }}
 					<div class="col-md-24">
 						<select name="users[]" id="users" multiple="multiple" class="form-control">
-							@foreach ($users as $user)
+							@foreach ($allUsers as $user)
 							<option value="{{ $user->id }}"{{ (in_array($user->id, $selectedUsers) ? ' selected="selected"' : '') }}>{{ $user->username }}</option>
 							@endforeach
 						</select>

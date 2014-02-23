@@ -2,45 +2,46 @@
 
 return array(
 
-	'Site' => array(
+	// Area -> Permissions -> Permission
+	
+	'Administration' => array(
 		array(
-			'permission' => 'site.create',
-			'label'      => 'Create',
-			'allow'      => 0,
-		),
-		
-		array(
-			'permission' => 'site.edit',
-			'label'      => 'Edit',
-			'allow'      => 0,
-		),
-		
-		array(
-			'permission' => 'site.delete',
-			'label'      => 'Delete',
-			'allow'      => 0,
+			'permission' => 'superuser',
+			'label'      => 'Super User',
 		),
 	),
 	
-	'Log' => array(
+	'Account' => array(
 		array(
-			'permission' => 'log.self',
-			'label'      => 'Only Self',
-			'allow'      => 1,
+			'permission' => 'account.create',
+			'label'      => 'Create',
 		),
 		
 		array(
-			'permission' => 'log.nonroot',
-			'label'      => 'All Non-Root',
-			'allow'      => 0,
+			'permission' => 'account.edit',
+			'label'      => 'Edit',
 		),
 		
 		array(
-			'permission' => 'log.all',
-			'label'      => 'All including Root',
-			'allow'      => 0,
+			'permission' => 'account.delete',
+			'label'      => 'Delete',
 		),
 	),
 
-
+	'Log' => array(
+		array(
+			'permission' => 'log.own',
+			'label'      => 'View own logs',
+		),
+		
+		array(
+			'permission' => 'log.users',
+			'label'      => 'View all logs except super users',
+		),
+		
+		array(
+			'permission' => 'log.superusers',
+			'label'      => 'View all logs',
+		),
+	),
 );

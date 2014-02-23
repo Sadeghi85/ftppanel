@@ -78,7 +78,7 @@ return array(
 		'dlbandwidth' => 'Download Bandwidth',
 		'quotasize' => 'Quota Size',
 		'quotafiles' => 'Quota Files',
-		'activate' => 'Activate',
+		'activated' => 'Activate',
 		'users' => 'Users',
 		
 	),

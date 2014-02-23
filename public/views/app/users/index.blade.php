@@ -37,27 +37,29 @@
 <table class="table table-hover table-striped table-curved">
 	  	<thead>
           <tr>
-            <th class="col-md-4">@lang('users/messages.index.id')</th>
-			<th class="col-md-12">@lang('users/messages.index.username')</th>
-			<th class="col-md-18">@lang('users/messages.index.name')</th>
-			
-			<th class="col-md-9">@lang('users/messages.index.activated')</th>
-			<th class="col-md-9">@lang('users/messages.index.created_at')</th>
-			<th class="col-md-9">@lang('users/messages.index.actions')</th>
+            <th style="width: 50px !important;text-align: center;">@lang('users/messages.index.id')</th>
+			<th style="width: 80px;text-align: center;">@lang('users/messages.index.activated')</th>
+			<th>@lang('users/messages.index.username')</th>
+			<th>@lang('users/messages.index.name')</th>
+
+			<th style="width: 150px;">@lang('users/messages.index.actions')</th>
           </tr>
       </thead>
 	<tbody>
 		@if ($users->count() >= 1)
 		@foreach ($users as $user)
 		<tr>
-			<td>{{ $user->id }}</td>
+			<td style="text-align: center;">{{ $user->id }}</td>
+			<td style="text-align: center;"><span class="glyphicon glyphicon-{{ ($user->activated ? 'ok'
+					 : 'remove')
+					}}"></span></td>
 			<td>{{ $user->username }}</td>
 			<td>{{ $user->fullName() }}</td>
 			
-			<td>@lang('general.' . ($user->isActivated() ? 'yes' : 'no'))</td>
-			<td>{{ $user->created_at->diffForHumans() }}</td>
 			<td>
 				{{ Form::open(array('route' => array('users.destroy', $user->id), 'method' => 'DELETE', 'id' => 'delete'.$user->id, 'name' => 'User: '.$user->username)) }}
+					
+					<a href="{{ route('users.show', $user->id) }}" class="btn btn-xs btn-default">@lang('button.show')</a>
 					
 					@if (Sentry::getId() !== $user->id and $user->username !== 'root')
 						<a href="{{ route('users.edit', $user->id) }}" class="btn btn-xs btn-default">@lang('button.edit')</a>

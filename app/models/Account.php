@@ -46,11 +46,6 @@ class Account extends Eloquent {
 		return $query->where('activated', '=', 1);
 	}
 
-	public function isActivated()
-	{
-		return ($this->activated == 1) ? true : false;
-	}
-
 	public function insertUser($users)
 	{
 		if (Group::isRoot())

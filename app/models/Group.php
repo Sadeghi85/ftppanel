@@ -11,13 +11,41 @@ class Group extends SentryGroupModel {
 	 */
 	protected $table = 'groups';
 	
-	public static function isRoot()
+	private $validationRules = array(
+        'name' => 'required|between:3,127|alpha_dash|unique:groups,name',
+    );
+	
+	private $validator;
+	
+	public function validationPasses($inputs)
+    {
+        // make a new validator object
+        $v = Validator::make($inputs, $this->validationRules);
+
+        // check for failure
+        if ($v->fails())
+        {
+            // set errors and return false
+            $this->validator = $v;
+            return false;
+        }
+
+        // validation pass
+        return true;
+    }
+	
+	public function validationFails($inputs)
 	{
-		if (Sentry::check() and Sentry::getUser()->inGroup(Sentry::findGroupByName('Root')))
-		{
-			return true;
-		}
-		
-		return false;
+		return ( ! $this->validationPasses($inputs));
 	}
+	
+	public function getValidator()
+    {
+        return $this->validator;
+    }
+	
+	public function setValidationRules(array $newRules)
+    {
+        $this->validationRules = array_merge($this->validationRules, $newRules);
+    }
 }

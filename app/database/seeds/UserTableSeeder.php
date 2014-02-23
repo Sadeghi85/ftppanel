@@ -9,13 +9,14 @@ class UserTableSeeder extends Seeder {
         try
 		{
 		    // Create the user
-		    $user = Sentry::createUser(array(
-		        'username'    => 'root',
-		        'password' => 'root',
+			$user = Sentry::getUserProvider()->create(array(
+		        'username'  => 'root',
+		        'password'  => 'root',
+				'activated' => 1,
 		    ));
 
 		    // Find the group using the group name
-		    $rootGroup = Sentry::findGroupByName('Root');
+		    $rootGroup = Sentry::getGroupProvider()->findByName('Root');
 
 		    // Assign the group to the user
 		    $user->addGroup($rootGroup);
@@ -37,18 +38,18 @@ class UserTableSeeder extends Seeder {
 		    echo 'Group was not found.';
 		}
 
-		try
-		{
-		    // Attempt to activate the user
-		    $user->attemptActivation('');
-		}
-		catch (Cartalyst\Sentry\Users\UserNotFoundException $e)
-		{
-		    echo 'User was not found.';
-		}
-		catch (Cartalyst\Sentry\Users\UserAlreadyActivatedException $e)
-		{
-		    echo 'User is already activated.';
-		}
+		// try
+		// {
+		   # Attempt to activate the user
+		    // $user->attemptActivation('');
+		// }
+		// catch (Cartalyst\Sentry\Users\UserNotFoundException $e)
+		// {
+		    // echo 'User was not found.';
+		// }
+		// catch (Cartalyst\Sentry\Users\UserAlreadyActivatedException $e)
+		// {
+		    // echo 'User is already activated.';
+		// }
     }
 }

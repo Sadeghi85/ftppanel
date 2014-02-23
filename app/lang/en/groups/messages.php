@@ -33,6 +33,26 @@ return array(
 	
 	),
 	
+	'show' => array(
+		'title' => 'Groups',
+
+		'header' => 'Group [:id]',
+
+		'back' => 'Back',
+
+		'key' => 'Key',
+		'value' => 'Value',
+
+		'id' => 'Id',
+		'name' => 'Name',
+		'permissions' => 'Permissions',
+		'permission' => 'Permission',
+		'resource' => 'Resource',
+
+		'created_at' => 'Created At',
+		'updated_at' => 'Updated At',
+	),
+	
 	'create' => array(
 		'title' => 'Create a Group',
 		'header' => 'Create a New Group',

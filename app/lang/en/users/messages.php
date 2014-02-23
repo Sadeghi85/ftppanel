@@ -37,6 +37,31 @@ return array(
 	
 	),
 	
+	'show' => array(
+		'title' => 'Users',
+
+		'header' => 'User [:id]',
+
+		'back' => 'Back',
+
+		'key' => 'Key',
+		'value' => 'Value',
+
+		'id' => 'Id',
+		'username' => 'Username',
+		'first_name' => 'First Name',
+		'last_name' => 'Last Name',
+		'activated' => 'Activated',
+		'groups' => 'Groups',
+		
+		'permissions' => 'Permissions',
+		'permission' => 'Permission',
+		'resource' => 'Resource',
+
+		'created_at' => 'Created At',
+		'updated_at' => 'Updated At',
+	),
+	
 	'create' => array(
 		'title' => 'Create a User',
 		'header' => 'Create a New User',
@@ -48,9 +73,8 @@ return array(
 		'password_confirmation' => 'Confirm Password',
 		'first_name' => 'First Name',
 		'last_name' => 'Last Name',
-		'activated' => 'User Activated',
-		'group' => 'Group',
-		'select_group' => 'Select a Group',
+		'activated' => 'Activate',
+		'groups' => 'Groups',
 		
 	),
 	

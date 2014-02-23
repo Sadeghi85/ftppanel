@@ -9,9 +9,12 @@ class GroupTableSeeder extends Seeder {
         try
 		{
 		    // Create the group
-		    $group = Sentry::createGroup(array(
-		        'name'        => 'Root',
-		    ));
+		    Sentry::getGroupProvider()->create(array(
+				'name'        => 'Root',
+				'permissions' => array(
+					'superuser' => 1,
+				),
+			));
 		}
 		catch (Cartalyst\Sentry\Groups\NameRequiredException $e)
 		{

@@ -110,12 +110,12 @@ class AccountsController extends AuthorizedController {
 			App::abort(403);
 		}
 		
-		$users = $selectedUsers = '';
+		$allUsers = $selectedUsers = '';
 		
 		if (Group::isRoot())
 		{
 			// Get all the available users
-			$users = Sentry::getUserProvider()->findAll();
+			$allUsers = Sentry::getUserProvider()->findAll();
 
 			// Selected users
 			$selectedUsers = Input::old('users', array());
@@ -128,7 +128,7 @@ class AccountsController extends AuthorizedController {
 		}
 
 		// Show the page
-		return View::make('app.accounts.create', compact('users', 'selectedUsers', 'indexPage'));
+		return View::make('app.accounts.create', compact('allUsers', 'selectedUsers', 'indexPage'));
 	}
 
 	/**
@@ -175,7 +175,7 @@ class AccountsController extends AuthorizedController {
 		$quotasize = (int) Input::get('quotasize');
 		$quotafiles = (int) Input::get('quotafiles');
 		$comment = Input::get('comment');
-		$activate = (int) Input::get('activate', 0);
+		$activated = (int) Input::get('activated', 0);
 
 		// Saving Account
 		try
@@ -188,7 +188,7 @@ class AccountsController extends AuthorizedController {
 				'quotasize' => $quotasize,
 				'quotafiles' => $quotafiles,
 				'comment' => e($comment),
-				'activated' => $activate,
+				'activated' => $activated,
 			));
 
 			$account->password = sha1($password);

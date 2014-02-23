@@ -18,19 +18,7 @@ class UsersController extends RootController {
 		// Call parent
 		parent::__construct();
 	}
-	
-	/**
-	 * Declare the rules for the form validation
-	 *
-	 * @var array
-	 */
-	protected $validationRules = array(
-		'username'       => 'required|between:3,127|alpha_dash|unique:users,username',
-		'first_name'       => 'between:3,127|alpha_dash',
-		'last_name'       => 'between:3,127|alpha_dash',
-		'password'         => 'required|between:3,32|confirmed',
-	);
-	
+
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -52,11 +40,18 @@ class UsersController extends RootController {
 	 */
 	public function create()
 	{
-		// Get all the available groups
-		$groups = Sentry::getGroupProvider()->findAll();
+		// Get all the available permissions
+		$allPermissions = Config::get('permissions');
+		$this->encodeAllPermissions($allPermissions, true);
 
-		// Selected group
-		$selectedGroup = Input::old('group', '-1');
+		// Selected permissions
+		$selectedPermissions = Input::old('permissions', array());
+
+		// Get all the available groups
+		$allGroups = Sentry::getGroupProvider()->findAll();
+
+		// Selected groups
+		$selectedGroups = Input::old('groups', array());
 		
 		$indexPage = '';
 		if (preg_match('#page=(\d+)#', URL::previous(), $matches))
@@ -65,7 +60,7 @@ class UsersController extends RootController {
 		}
 
 		// Show the page
-		return View::make('app.users.create', compact('groups', 'selectedGroup', 'indexPage'));
+		return View::make('app.users.create', compact('allPermissions', 'selectedPermissions', 'allGroups', 'selectedGroups', 'indexPage'));
 	}
 
 	/**
@@ -75,53 +70,59 @@ class UsersController extends RootController {
 	 */
 	public function store()
 	{
-		// Create a new validator instance from our validation rules
-		$validator = Validator::make(Input::all(), $this->validationRules);
-
-		// If validation fails, we'll exit the operation now.
-		if ($validator->fails())
+		$userInstance = new User;
+		
+		if ($userInstance->validationFails(Input::all()))
 		{
 			// Ooops.. something went wrong
-			return Redirect::back()->withInput(Input::except('password', 'password_confirmation'))->withErrors($validator);
+			return Redirect::back()->withInput(Input::except('password', 'password_confirmation'))->withErrors($userInstance->getValidator());
 		}
 
-		try
-		{
-			// Find the Group
-			$groupId = Input::get('group', '-1');
-			$group = Sentry::getGroupProvider()->findById($groupId);
-			$assignGroup = true;
-		}
-		catch (GroupNotFoundException $e)
-		{
-			$assignGroup = false;
-		}
+		// We need to reverse the UI specific logic for our
+		// permissions here before we create the user.
+		$permissions = Input::get('permissions', array());
+		$this->decodePermissions($permissions);
+		
+		if ( ! json_encode($permissions))
+			return Redirect::back()->withInput()->with('error', 'Invalid form data.');
 		
 		try
 		{
 			// Get the inputs, with some exceptions
-			$inputs = Input::except('csrf_token', 'password_confirmation', 'group', 'indexPage');
+			$inputs = array_merge(Input::only('username', 'password', 'first_name', 'last_name', 'activated'), compact('permissions'));
 
 			// Was the user created?
 			if ($user = Sentry::getUserProvider()->create($inputs))
 			{
-				// Assign the selected group to this user
-				if ($assignGroup) { $user->addGroup($group); }
-				
+				// Assign the selected groups to this user
+				foreach (Input::get('groups', array()) as $groupId)
+				{
+					try
+					{
+						$group = Sentry::getGroupProvider()->findById($groupId);
+
+						$user->addGroup($group);
+					}
+					catch (GroupNotFoundException $e)
+					{
+
+					}
+				}
+
 				// Log
-				$usernameToLog = $user->usernameWithFullName();
-				$currentUserUsername = Sentry::getUser()->usernameWithFullName();
-				$user->load('groups');
-				$myLog = new MyLog;
-				$myLog->insertLog(
-					array(
-							'description' => sprintf('User [%s] has created the User [%s].%sCurrent Status:%s%s', $currentUserUsername, $usernameToLog, "\r\n\r\n", "\r\n\r\n", print_r($user->toArray(), true)),
-							'user_id'     => Sentry::getUser()->id,
-							'domain_id'   => null,
-							'event'       => 'Create User',
-							'type'        => 'info',
-					)
-				);
+				// $usernameToLog = $user->usernameWithFullName();
+				// $currentUserUsername = Sentry::getUser()->usernameWithFullName();
+				// $user->load('groups');
+				// $myLog = new MyLog;
+				// $myLog->insertLog(
+					// array(
+							// 'description' => sprintf('User [%s] has created the User [%s].%sCurrent Status:%s%s', $currentUserUsername, $usernameToLog, "\r\n\r\n", "\r\n\r\n", print_r($user->toArray(), true)),
+							// 'user_id'     => Sentry::getUser()->id,
+							// 'domain_id'   => null,
+							// 'event'       => 'Create User',
+							// 'type'        => 'info',
+					// )
+				// );
 
 				// Prepare the success message
 				$success = Lang::get('users/messages.success.create');
@@ -161,7 +162,26 @@ class UsersController extends RootController {
 	 */
 	public function show($id)
 	{
-		//
+		try
+		{
+			// Get the user information
+			$user = Sentry::getUserProvider()->findById($id);
+		}
+		catch (UserNotFoundException $e)
+		{
+			// Prepare the error message
+			$error = Lang::get('users/messages.error.user_not_found', compact('id'));
+			
+			// Redirect to the groups management page
+			return Redirect::route('users.index')->with('error', $error);
+		}
+
+		$allPermissions = Config::get('permissions');
+		$selectedPermissions = $user->getMergedPermissions();
+		
+		$groups = $user->groups()->lists('name');
+		
+		return View::make('app.users.show', compact('user', 'groups', 'allPermissions', 'selectedPermissions'));
 	}
 
 	/**
@@ -172,16 +192,14 @@ class UsersController extends RootController {
 	 */
 	public function edit($id)
 	{
+		// Disallow editing root
+		if ($id == 1)
+			App::abort('403');
+		
 		try
 		{
 			// Get the user information
 			$user = Sentry::getUserProvider()->findById($id);
-
-			// Get this user group
-			$userGroup = $user->groups()->pluck('id');
-
-			// Get a list of all the available groups
-			$groups = Sentry::getGroupProvider()->findAll();
 		}
 		catch (UserNotFoundException $e)
 		{
@@ -192,6 +210,25 @@ class UsersController extends RootController {
 			return Redirect::route('users.index')->with('error', $error);
 		}
 
+		// Get all the available permissions
+		$allPermissions = Config::get('permissions');
+		$this->encodeAllPermissions($allPermissions, true);
+
+		// Selected permissions
+		$selectedPermissions = Input::old('permissions', array());
+
+		// Get this user permissions
+		$selectedPermissions = $user->getPermissions();
+		$this->encodePermissions($selectedPermissions);
+		
+		$selectedPermissions = array_merge($selectedPermissions, Input::old('permissions', array()));
+		
+		// Get all the available groups
+		$allGroups = Sentry::getGroupProvider()->findAll();
+
+		// Get this user groups
+		$selectedGroups = array_merge($user->getGroups()->lists('id'), Input::old('groups', array()));
+		
 		$indexPage = '';
 		if (preg_match('#page=(\d+)#', URL::previous(), $matches))
 		{
@@ -199,7 +236,7 @@ class UsersController extends RootController {
 		}
 		
 		// Show the page
-		return View::make('app.users.edit', compact('user', 'groups', 'userGroup', 'indexPage'));
+		return View::make('app.users.edit', compact('user', 'allGroups', 'selectedGroups', 'indexPage', 'allPermissions', 'selectedPermissions'));
 	}
 
 	/**
@@ -210,6 +247,10 @@ class UsersController extends RootController {
 	 */
 	public function update($id)
 	{
+		// Disallow editing root
+		if ($id == 1)
+			App::abort('403');
+		
 		try
 		{
 			// Get the user information
@@ -345,6 +386,10 @@ class UsersController extends RootController {
 	 */
 	public function destroy($id)
 	{
+		// Disallow deleting root
+		if ($id == 1)
+			App::abort('403');
+		
 		try
 		{
 			// Get user information

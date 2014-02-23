@@ -18,6 +18,48 @@ class User extends SentryUserModel {
 	 */
 	protected $hidden = array('password');
 	
+	private $validationRules = array(
+        'username'       => 'required|between:3,127|alpha_dash|unique:users,username',
+		'first_name'       => 'between:3,127|alpha_dash',
+		'last_name'       => 'between:3,127|alpha_dash',
+		'password'         => 'required|between:3,32|confirmed',
+		'password_confirmation'  => 'required|between:3,32|same:password',
+    );
+	
+	private $validator;
+	
+	public function validationPasses($inputs)
+    {
+        // make a new validator object
+        $v = Validator::make($inputs, $this->validationRules);
+
+        // check for failure
+        if ($v->fails())
+        {
+            // set errors and return false
+            $this->validator = $v;
+            return false;
+        }
+
+        // validation pass
+        return true;
+    }
+	
+	public function validationFails($inputs)
+	{
+		return ( ! $this->validationPasses($inputs));
+	}
+	
+	public function getValidator()
+    {
+        return $this->validator;
+    }
+	
+	public function setValidationRules(array $newRules)
+    {
+        $this->validationRules = array_merge($this->validationRules, $newRules);
+    }
+	
 	/**
 	 * Many to many relationship.
 	 *
@@ -39,7 +81,6 @@ class User extends SentryUserModel {
     {
         return $this->hasMany('MyLog', 'user_id');
     }
-	
 	
 	/**
 	 * Returns the user full name, it simply concatenates

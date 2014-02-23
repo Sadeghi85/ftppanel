@@ -37,23 +37,23 @@
 <table class="table table-hover table-striped table-curved">
 	  	<thead>
           <tr>
-            <th class="col-md-4">@lang('groups/messages.index.id')</th>
-			<th class="col-md-36">@lang('groups/messages.index.name')</th>
-			<th class="col-md-9">@lang('groups/messages.index.users')</th>
-			<th class="col-md-9">@lang('groups/messages.index.created_at')</th>
-			<th class="col-md-9">@lang('groups/messages.index.actions')</th>
+            <th style="width: 50px;text-align: center;">@lang('groups/messages.index.id')</th>
+			<th >@lang('groups/messages.index.name')</th>
+			<th style="width: 100px;">@lang('groups/messages.index.users')</th>
+			<th style="width: 150px;">@lang('groups/messages.index.actions')</th>
           </tr>
       </thead>
 	<tbody>
 		@if ($groups->count() >= 1)
 			@foreach ($groups as $group)
 				<tr>
-					<td>{{ $group->id }}</td>
+					<td style="text-align: center;">{{ $group->id }}</td>
 					<td>{{ $group->name }}</td>
-					<td>{{ $group->users()->count() }}</td>
-					<td>{{ $group->created_at->diffForHumans() }}</td>
+					<td style="text-align: center;">{{ $group->users()->count() }}</td>
 					<td>
 						{{ Form::open(array('route' => array('groups.destroy', $group->id), 'method' => 'DELETE', 'id' => 'delete'.$group->id, 'name' => 'Group: '.$group->name)) }}
+							
+							<a href="{{ route('groups.show', $group->id) }}" class="btn btn-xs btn-default">@lang('button.show')</a>
 							
 							@if ($group->name !== 'Root')
 								<a href="{{ route('groups.edit', $group->id) }}" class="btn btn-xs btn-default">@lang('button.edit')</a>
@@ -68,7 +68,7 @@
 			@endforeach
 		@else
 		<tr>
-			<td colspan="5">No results</td>
+
 		</tr>
 		@endif
 	</tbody>

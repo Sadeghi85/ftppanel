@@ -45,7 +45,7 @@
 			</tr>
 			<tr>
 				<td>@lang('accounts/messages.show.activated')</td>
-				<td><span class="glyphicon glyphicon-{{ ($account->isActivated() ? 'ok'
+				<td><span class="glyphicon glyphicon-{{ ($account->activated ? 'ok'
 					 : 'remove')
 					}}"></span></td>
 			</tr>

@@ -20,10 +20,10 @@ Route::get('/', function()
 Route::group(array('before' => 'auth.sentry.root'), function()
 {
 	// Group
-	Route::resource('groups', 'GroupsController', array('except' => array('show')));
+	Route::resource('groups', 'GroupsController');
 	
 	// User
-	Route::resource('users', 'UsersController', array('except' => array('show')));
+	Route::resource('users', 'UsersController');
 });
 
 Route::group(array('before' => 'auth.sentry'), function()

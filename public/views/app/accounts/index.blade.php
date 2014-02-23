@@ -42,8 +42,8 @@
 <table class="table table-hover table-striped table-curved">
 	<thead>
 		<tr>
-			<th style="width: 50px;">@lang('accounts/messages.index.id')</th>
-			<th style="width: 80px;">@lang('accounts/messages.index.activated')</th>
+			<th style="width: 50px;text-align: center;">@lang('accounts/messages.index.id')</th>
+			<th style="width: 80px;text-align: center;">@lang('accounts/messages.index.activated')</th>
 			<th class="col-md-10">@lang('accounts/messages.index.username')</th>
 			<th >@lang('accounts/messages.index.home')</th>
 
@@ -59,9 +59,9 @@
 		@if ($accounts->count() >= 1)
 			@foreach ($accounts as $account)
 				<tr>
-					<td>{{ $account->id }}</td>
-<!--					<td>@lang('general.' . ($account->isActivated() ? 'yes' : 'no'))</td>-->
-					<td style="text-align: center;"><span class="glyphicon glyphicon-{{ ($account->isActivated() ? 'ok'
+					<td style="text-align: center;">{{ $account->id }}</td>
+<!--					<td>@lang('general.' . ($account->activated ? 'yes' : 'no'))</td>-->
+					<td style="text-align: center;"><span class="glyphicon glyphicon-{{ ($account->activated ? 'ok'
 					 : 'remove')
 					}}"></span></td>
 					<td>{{ $account->username }}</td>
