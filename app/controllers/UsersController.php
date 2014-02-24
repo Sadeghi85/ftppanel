@@ -265,98 +265,93 @@ class UsersController extends RootController {
 			return Redirect::route('users.index')->with('error', $error);
 		}
 
-		$usernameToLog = $user->usernameWithFullName();
+		//$usernameToLog = $user->usernameWithFullName();
 		
-		$this->validationRules['username'] = 'required|between:3,127|alpha_dash|unique:users,username,'.$user->id;
-
-		// Do we want to update the user password?
-		if ( ! $password = Input::get('password'))
-		{
-			unset($this->validationRules['password']);
-			unset($this->validationRules['password_confirmation']);
-		}
-
-		// Create a new validator instance from our validation rules
-		$validator = Validator::make(Input::all(), $this->validationRules);
-
-		// If validation fails, we'll exit the operation now.
-		if ($validator->fails())
+		// Validation
+		$user->setValidationRules(array(
+			'username' => 'required|between:3,127|alpha_dash|unique:users,username,'.$id,
+			'password'         => 'between:3,32|confirmed',
+			'password_confirmation'  => 'between:3,32|same:password',
+		));
+		
+		if ($user->validationFails(Input::all()))
 		{
 			// Ooops.. something went wrong
-			return Redirect::back()->withInput(Input::except('password', 'password_confirmation'))->withErrors($validator);
-		}
-
-		try
-		{
-			// Find the Group
-			$groupId = Input::get('group', '-1');
-			$group = Sentry::getGroupProvider()->findById($groupId);
-			$assignGroup = true;
-		}
-		catch (GroupNotFoundException $e)
-		{
-			$assignGroup = false;
+			return Redirect::back()->withInput(Input::except('password', 'password_confirmation'))->withErrors($user->getValidator());
 		}
 		
-		try
-		{
-			// Get this user group
-			$userGroupId = $user->groups()->pluck('id');
-			$userGroup = Sentry::getGroupProvider()->findById($userGroupId);
-			$hasGroup = true;
-		}
-		catch (GroupNotFoundException $e)
-		{
-			$hasGroup = false;
-		}
+		// We need to reverse the UI specific logic for our
+		// permissions here before we update the group.
+		$permissions = Input::get('permissions', array());
+		$this->decodePermissions($permissions);
+
+		if ( ! json_encode($permissions))
+			return Redirect::back()->withInput()->with('error', 'Invalid form data.');
 		
 		try
 		{
 			// Update the user
-			$user->first_name  = Input::get('first_name');
-			$user->last_name   = Input::get('last_name');
-			$user->username    = Input::get('username');
-			$user->activated   = Input::get('activated', $user->activated);
-
-			// Do we want to update the user password?
-			if ($password)
-			{
-				$user->password = $password;
-			}
-
-			// Update user group
-			if ($userGroupId != $groupId)
-			{
-				if ($hasGroup)
-				{
-					$user->removeGroup($userGroup);
-				}
-
-				if ($assignGroup)
-				{
-					$user->addGroup($group);
-				}
-			}
-			
+			$inputs = array_filter(array_merge(Input::only('username', 'password', 'first_name', 'last_name', 'activated'), compact('permissions')));
 			// Log the user out
-			$user->persist_code = null;
+			$inputs['persist_code'] = null;
 			
 			// Was the user updated?
-			if ($user->save())
+			if ($user->update($inputs))
 			{
+				// Get the current user groups
+				$groups = $user->getGroups()->lists('id');
+
+				// Get the selected groups
+				$selectedGroups = Input::get('groups', array());
+
+				// Groups comparison between the groups the user currently
+				// have and the groups the user wish to have.
+				$groupsToAdd    = array_diff($selectedGroups, $groups);
+				$groupsToRemove = array_diff($groups, $selectedGroups);
+
+				// Assign the user to groups
+				foreach ($groupsToAdd as $groupId)
+				{
+					try
+					{
+						$group = Sentry::getGroupProvider()->findById($groupId);
+
+						$user->addGroup($group);
+					}
+					catch (GroupNotFoundException $e)
+					{
+
+					}
+				}
+
+				// Remove the user from groups
+				foreach ($groupsToRemove as $groupId)
+				{
+					try
+					{
+						$group = Sentry::getGroupProvider()->findById($groupId);
+
+						$user->removeGroup($group);
+					}
+					catch (GroupNotFoundException $e)
+					{
+
+					}
+				}
+				
 				// Log
-				$currentUserUsername = Sentry::getUser()->usernameWithFullName();
-				$user->load('groups');
-				$myLog = new MyLog;
-				$myLog->insertLog(
-					array(
-							'description' => sprintf('User [%s] has edited the User [%s].%sCurrent Status:%s%s', $currentUserUsername, $usernameToLog, "\r\n\r\n", "\r\n\r\n", print_r($user->toArray(), true)),
-							'user_id'     => Sentry::getUser()->id,
-							'domain_id'   => null,
-							'event'       => 'Edit User',
-							'type'        => 'info',
-					)
-				);
+				// $currentUserUsername = Sentry::getUser()->usernameWithFullName();
+				// $user->load('groups');
+				// $myLog = new MyLog;
+				// $myLog->insertLog(
+					// array(
+							// 'description' => sprintf('User [%s] has edited the User [%s].%sCurrent Status:%s%s', $currentUserUsername, $usernameToLog, "\r\n\r\n", "\r\n\r\n", print_r($user->toArray(), true)),
+							// 'user_id'     => Sentry::getUser()->id,
+							// 'domain_id'   => null,
+							// 'event'       => 'Edit User',
+							// 'type'        => 'info',
+					// )
+				// );
 				
 				// Prepare the success message
 				$success = Lang::get('users/messages.success.update');
@@ -395,7 +390,7 @@ class UsersController extends RootController {
 			// Get user information
 			$user = Sentry::getUserProvider()->findById($id);
 
-			// Check if we are not trying to delete ourselves
+			// Check if we are not trying to delete ourself
 			if ($user->id === Sentry::getId())
 			{
 				// Prepare the error message
@@ -409,24 +404,18 @@ class UsersController extends RootController {
 			$user->delete();
 
 			// Log
-			$usernameToLog = $user->usernameWithFullName();
-			$currentUserUsername = Sentry::getUser()->usernameWithFullName();
-			$myLog = new MyLog;
-			$myLog->insertLog(
-				array(
-						'description' => sprintf('User [%s] has deleted the User [%s].', $currentUserUsername, $usernameToLog),
-						'user_id'     => Sentry::getUser()->id,
-						'domain_id'   => null,
-						'event'       => 'Delete User',
-						'type'        => 'warning',
-				)
-			);
-			
-			// Prepare the success message
-			$success = Lang::get('users/messages.success.delete');
-
-			// Redirect to the user management page
-			return Redirect::back()->with('success', $success);
+			// $usernameToLog = $user->usernameWithFullName();
+			// $currentUserUsername = Sentry::getUser()->usernameWithFullName();
+			// $myLog = new MyLog;
+			// $myLog->insertLog(
+				// array(
+						// 'description' => sprintf('User [%s] has deleted the User [%s].', $currentUserUsername, $usernameToLog),
+						// 'user_id'     => Sentry::getUser()->id,
+						// 'domain_id'   => null,
+						// 'event'       => 'Delete User',
+						// 'type'        => 'warning',
+				// )
+			// );
 		}
 		catch (UserNotFoundException $e)
 		{
@@ -436,6 +425,12 @@ class UsersController extends RootController {
 			// Redirect to the user management page
 			return Redirect::back()->with('error', $error);
 		}
+		
+		// Prepare the success message
+		$success = Lang::get('users/messages.success.delete');
+
+		// Redirect to the user management page
+		return Redirect::back()->with('success', $success);
 	}
 
 }

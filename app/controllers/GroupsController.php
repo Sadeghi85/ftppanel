@@ -216,11 +216,10 @@ class GroupsController extends RootController {
 		try
 		{
 			// Update the group data
-			$group->name        = Input::get('name');
-			$group->permissions = $permissions;
-
+			$inputs = array_merge(Input::only('name'), compact('permissions'));
+			
 			// Was the group updated?
-			if ($group->save())
+			if ($group->update($inputs))
 			{
 				// Log all this group's users out
 				$users = Sentry::findAllUsersInGroup($group);
@@ -278,7 +277,6 @@ class GroupsController extends RootController {
 		{
 			// Get group information
 			$group = Sentry::getGroupProvider()->findById($id);
-			
 			
 			// Log all this group's users out
 			$users = Sentry::findAllUsersInGroup($group);

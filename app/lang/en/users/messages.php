@@ -89,9 +89,8 @@ return array(
 		'password_confirmation' => 'Confirm Password',
 		'first_name' => 'First Name',
 		'last_name' => 'Last Name',
-		'activated' => 'User Activated',
-		'group' => 'Group',
-		'select_group' => 'Select a Group',
+		'activated' => 'Activate',
+		'groups' => 'Groups',
 		
 	),
 );
