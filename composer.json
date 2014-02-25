@@ -7,7 +7,7 @@
 		"laravel/framework": "4.1.*",
 		"barryvdh/laravel-debugbar": "1.*",
 		"barryvdh/laravel-ide-helper": "1.*",
-		"cartalyst/sentry": "2.0.*"
+		"cartalyst/sentry": "2.1.*"
 	},
 	"autoload": {
 		"classmap": [
