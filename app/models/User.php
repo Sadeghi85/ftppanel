@@ -57,7 +57,7 @@ class User extends SentryUserModel {
 	
 	public function setValidationRules(array $newRules)
     {
-        $this->validationRules = array_merge($this->validationRules, $newRules);
+        $this->validationRules = array_replace($this->validationRules, $newRules);
     }
 	
 	/**

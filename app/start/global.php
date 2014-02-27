@@ -46,6 +46,13 @@ Log::useFiles(storage_path().'/logs/laravel.log');
 |
 */
 
+App::fatal(function($exception)
+{
+	Log::error($exception);
+	
+    return Response::make(View::make('error/500'), 500);
+});
+
 App::error(function(Exception $exception, $code)
 {
 	Log::error($exception);
@@ -68,6 +75,18 @@ App::error(function(Exception $exception, $code)
 		}
 	}
 });
+
+App::error(function(Illuminate\Session\TokenMismatchException $exception, $code)
+{
+    return Response::make(View::make('error/token_mismatch'), 403);
+});
+
+App::missing(function($exception)
+{
+    return Response::make(View::make('error/404'), 404);
+});
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -99,6 +118,43 @@ App::down(function()
 */
 
 require app_path().'/filters.php';
+
+/*
+|--------------------------------------------------------------------------
+| Validator Extends
+|--------------------------------------------------------------------------
+|
+*/
+
+Validator::extend('custom.ip_range', function($attribute, $value, $parameters)
+{
+	$inputs = explode("\r\n", trim($value));
+
+	foreach ($inputs as $input)
+	{
+		$ip = explode('-', $input);
+		
+		if (count($ip) > 2)
+			return false;
+
+		{
+			$validator = Validator::make(array($attribute => $ip[0]), array($attribute => 'ip'));
+
+			if ($validator->fails())
+				return false;
+		}
+		
+		if (count($ip) == 2)
+		{
+			$validator = Validator::make(array($attribute => $ip[1]), array($attribute => 'ip'));
+
+			if ($validator->fails())
+				return false;
+		}
+	}
+
+	return true;
+});
 
 /*
 |--------------------------------------------------------------------------

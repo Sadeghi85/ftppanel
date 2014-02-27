@@ -18,6 +18,32 @@ class BaseController extends Controller {
 		$this->beforeFilter('csrf', array('on' => 'post'));
 		
 		$this->messageBag = new Illuminate\Support\MessageBag;
+		
+		$this->trimInputBeforeValidation();
+	}
+	
+	/**
+	 * Trim Input Before Validation.
+	 */
+	public function trimInputBeforeValidation()
+	{
+		$inputs = array();
+		
+		foreach(Input::get() as $name => $input)
+		{
+			if (is_array($input))
+			{
+				array_walk_recursive($input, 'trim');
+				
+				$inputs[$name] = $input;
+			}
+			else
+			{
+				$inputs[$name] = trim($input);
+			}
+		}
+		
+		Input::merge($inputs);
 	}
 	
 	/**

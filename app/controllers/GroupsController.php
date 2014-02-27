@@ -165,7 +165,7 @@ class GroupsController extends RootController {
 		$selectedPermissions = $group->getPermissions();
 		$this->encodePermissions($selectedPermissions);
 		
-		$selectedPermissions = array_merge($selectedPermissions, Input::old('permissions', array()));
+		$selectedPermissions = array_replace($selectedPermissions, Input::old('permissions', array()));
 
 		// Show the page
 		return View::make('app.groups.edit', compact('group', 'allPermissions', 'selectedPermissions'));

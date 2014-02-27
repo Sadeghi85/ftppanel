@@ -218,7 +218,7 @@
 		</div>
 	</div>
 
-@if (Group::isRoot())
+@if (Sentry::getUser()->isSuperUser())
 	<div class="panel panel-primary">
 		<div class="panel-heading">
 			<span class="glyphicon glyphicon-collapse-up pull-right"></span>

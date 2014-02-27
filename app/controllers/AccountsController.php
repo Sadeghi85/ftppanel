@@ -9,47 +9,7 @@ class AccountsController extends AuthorizedController {
 	{
 		// Call parent
 		parent::__construct();
-		
-		Validator::extend('custom.ip_range', function($attribute, $value, $parameters)
-		{
-			$inputs = explode("\r\n", trim($value));
-
-			foreach ($inputs as $input)
-			{
-				$ip = explode('-', $input);
-
-				$validator = Validator::make(array($attribute => $ip[0]), array($attribute => 'ip'));
-
-				if ($validator->fails()) { return false; }
-
-				if (count($ip) == 2)
-				{
-					$validator = Validator::make(array($attribute => $ip[1]), array($attribute => 'ip'));
-
-					if ($validator->fails()) { return false; }
-				}
-			}
-
-			return true;
-		});
 	}
-	
-	/**
-	 * Declare the rules for the form validation
-	 *
-	 * @var array
-	 */
-	protected $validationRules = array(
-		'username'     => 'required|between:3,127|alpha_dash|unique:accounts,username',
-		'password'     => 'required|between:3,32|confirmed',
-
-		'home'         => array('required', 'between:1,127', 'regex:/^[\/a-zA-z0-9_-]+$/'),
-		'ip'           => 'sometimes|custom.ip_range',
-		'ulbandwidth'  => 'sometimes|integer',
-		'dlbandwidth'  => 'sometimes|integer',
-		'quotasize'    => 'sometimes|integer',
-		'quotafiles'   => 'sometimes|integer',
-	);
 	
 	/**
 	 * Display a listing of the resource.
@@ -59,7 +19,7 @@ class AccountsController extends AuthorizedController {
 	public function index()
 	{
 		// Grab all the domains for current user
-		if (Group::isRoot())
+		if (Sentry::getUser()->isSuperUser())
 		{
 			$accounts = Account::paginate();
 		}
@@ -80,7 +40,7 @@ class AccountsController extends AuthorizedController {
 	 */
 	public function show($id)
 	{
-		if (Group::isRoot())
+		if (Sentry::getUser()->isSuperUser())
 		{
 			$account = Account::with('ip')->find($id);
 		}
@@ -105,18 +65,24 @@ class AccountsController extends AuthorizedController {
 	 */
 	public function create()
 	{
-		if ( ! (Group::isRoot() or Sentry::getUser()->hasAccess('account.create')))
+		if ( ! Sentry::getUser()->hasAccess('account.create'))
 		{
 			App::abort(403);
 		}
 		
 		$allUsers = $selectedUsers = '';
 		
-		if (Group::isRoot())
+		if (Sentry::getUser()->isSuperUser())
 		{
-			// Get all the available users
-			$allUsers = Sentry::getUserProvider()->findAll();
-
+			// Get all the available users except superusers
+			$allUsers = array_filter(
+							Sentry::getUserProvider()->findAll(),
+							function($user)
+							{
+								return ! $user->hasAccess('superuser');
+							}
+						);
+			
 			// Selected users
 			$selectedUsers = Input::old('users', array());
 		}
@@ -138,22 +104,15 @@ class AccountsController extends AuthorizedController {
 	 */
 	public function store()
 	{
-		if ( ! (Group::isRoot() or Sentry::getUser()->hasAccess('account.create')))
+		if ( ! Sentry::getUser()->hasAccess('account.create'))
 		{
 			App::abort(403);
 		}
 		
-		app('request')->request->set('username', trim(Input::get('username')));
-		app('request')->request->set('password', trim(Input::get('password')));
-		app('request')->request->set('home', '/'.strtolower(trim(trim(str_replace('\\', '/', Input::get('home'))),
-				'/')));
-		app('request')->request->set('ip', implode("\r\n", array_unique(array_filter(array_map('trim',
-			explode("\r\n",str_replace(' ', '', Input::get('ip'))))))));
-		app('request')->request->set('ulbandwidth', trim(Input::get('ulbandwidth')));
-		app('request')->request->set('dlbandwidth', trim(Input::get('dlbandwidth')));
-		app('request')->request->set('quotasize', trim(Input::get('quotasize')));
-		app('request')->request->set('quotafiles', trim(Input::get('quotafiles')));
-		app('request')->request->set('comment', trim(Input::get('comment')));
+		Input::merge(array(
+			'home' => strtolower(trim(trim(str_replace('\\', '/', Input::get('home'))),	'/')),
+			'ip'   => implode("\r\n", array_unique(array_filter(array_map('trim', explode("\r\n",str_replace(' ', '', Input::get('ip'))))))),
+		));
 
 		// Create a new validator instance from our validation rules
 		$validator = Validator::make(Input::all(), $this->validationRules);
@@ -182,7 +141,7 @@ class AccountsController extends AuthorizedController {
 		{
 			$account = new Account(array(
 				'username' => $username,
-				'home' => Config::get('ftppanel.ftpHome').$home,
+				'home' => Config::get('ftppanel.ftpHome').'/'.$home,
 				'ulbandwidth' => $ulbandwidth,
 				'dlbandwidth' => $dlbandwidth,
 				'quotasize' => $quotasize,

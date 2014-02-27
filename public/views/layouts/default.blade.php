@@ -90,6 +90,8 @@
 		</div><!--/.col-->
 	</div><!--/.row-->
 </div><!--/.container-->
+
+@include('partials/keep_alive')
 @show
 
 @section('javascript')

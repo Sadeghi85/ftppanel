@@ -17,6 +17,53 @@ class Account extends Eloquent {
 	protected $hidden = array('password');
 
 	protected $guarded = array('id', 'password');
+	
+	private $validationRules = array(
+		'username'     => 'required|between:3,127|alpha_dash|unique:accounts,username',
+		'password'     => 'required|between:3,32|confirmed',
+		'password_confirmation'  => 'required|between:3,32|same:password',
+
+		'home'         => array('required', 'between:1,127', 'regex:/^[\/a-zA-z0-9_-]+$/'),
+		'ip'           => 'custom.ip_range',
+		'ulbandwidth'  => 'integer',
+		'dlbandwidth'  => 'integer',
+		'quotasize'    => 'integer',
+		'quotafiles'   => 'integer',
+    );
+	
+	private $validator;
+	
+	public function validationPasses($inputs)
+    {
+        // make a new validator object
+        $v = Validator::make($inputs, $this->validationRules);
+
+        // check for failure
+        if ($v->fails())
+        {
+            // set errors and return false
+            $this->validator = $v;
+            return false;
+        }
+
+        // validation pass
+        return true;
+    }
+	
+	public function validationFails($inputs)
+	{
+		return ( ! $this->validationPasses($inputs));
+	}
+	
+	public function getValidator()
+    {
+        return $this->validator;
+    }
+	
+	public function setValidationRules(array $newRules)
+    {
+        $this->validationRules = array_replace($this->validationRules, $newRules);
+    }
 
 	/**
 	 * Many to many relationship.

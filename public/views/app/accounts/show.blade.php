@@ -55,9 +55,7 @@
 			</tr>
 			<tr>
 				<td>@lang('accounts/messages.show.home')</td>
-				<td><span class="label label-primary">{{ Config::get('ftppanel.ftpHome') }}</span><span class="label label-success">{{ str_replace(Config::get('ftppanel.ftpHome'), '',
-				                                                                      $account->home)
-				                                                                      }}</span></td>
+				<td><span class="label label-primary">{{ Config::get('ftppanel.ftpHome') }}</span><span class="label label-success">{{ str_replace(Config::get('ftppanel.ftpHome'), '', $account->home) }}</span></td>
 			</tr>
 			<tr>
 				<td>@lang('accounts/messages.show.comment')</td>

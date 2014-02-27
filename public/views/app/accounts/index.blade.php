@@ -25,7 +25,7 @@
 		@lang('accounts/messages.index.header')
 
 		<div class="pull-right">
-			@if (Group::isRoot() or Sentry::getUser()->hasAccess('account.create'))
+			@if (Sentry::getUser()->hasAccess('account.create'))
 				<a href="{{ route('accounts.create') }}" class="btn btn-sm btn-primary"><i class="glyphicon glyphicon-plus-sign"></i> @lang('accounts/messages.index.create')</a>
 			@else
 				<span class="btn btn-sm btn-primary disabled"><i class="glyphicon glyphicon-plus-sign"></i> @lang('accounts/messages.index.create')</span>
@@ -44,45 +44,36 @@
 		<tr>
 			<th style="width: 50px;text-align: center;">@lang('accounts/messages.index.id')</th>
 			<th style="width: 80px;text-align: center;">@lang('accounts/messages.index.activated')</th>
-			<th class="col-md-10">@lang('accounts/messages.index.username')</th>
+			<th style="width: 300px;">@lang('accounts/messages.index.username')</th>
 			<th >@lang('accounts/messages.index.home')</th>
 
 			<th style="width: 150px;">@lang('accounts/messages.index.actions')</th>
 		</tr>
 	  </thead>
 	<tbody>
-		@php
-			$canEdit = Group::isRoot() or Sentry::getUser()->hasAccess('account.edit');
-			$canDelete = Group::isRoot() or Sentry::getUser()->hasAccess('account.delete');
-		@endphp
-
 		@if ($accounts->count() >= 1)
 			@foreach ($accounts as $account)
 				<tr>
 					<td style="text-align: center;">{{ $account->id }}</td>
-<!--					<td>@lang('general.' . ($account->activated ? 'yes' : 'no'))</td>-->
 					<td style="text-align: center;"><span class="glyphicon glyphicon-{{ ($account->activated ? 'ok'
 					 : 'remove')
 					}}"></span></td>
 					<td>{{ $account->username }}</td>
 
-					<td><span class="label label-primary">{{ Config::get('ftppanel.ftpHome') }}</span><span class="label label-success">{{ str_replace(Config::get('ftppanel.ftpHome'), '',
-				                                                                      $account->home)
-				                                                                      }}</span></td>
+					<td><span class="label label-primary">{{ Config::get('ftppanel.ftpHome') }}</span><span class="label label-success">{{ str_replace(Config::get('ftppanel.ftpHome'), '', $account->home) }}</span></td>
 
 					<td>
 						{{ Form::open(array('route' => array('accounts.destroy', $account->id), 'method' => 'DELETE', 'id' => 'delete'.$account->id, 'name' => 'Account: '.$account->username)) }}
 
-							<a href="{{ route('accounts.show', $account->id) }}" class="btn btn-xs btn-default">@lang
-							                                                                                   ('button.show')</a>
+							<a href="{{ route('accounts.show', $account->id) }}" class="btn btn-xs btn-default">@lang('button.show')</a>
 
-							@if ($canEdit)
+							@if (Sentry::getUser()->hasAccess('account.edit'))
 								<a href="{{ route('accounts.edit', $account->id) }}" class="btn btn-xs btn-default">@lang('button.edit')</a>
 							@else
 								<span class="btn btn-xs btn-default disabled">@lang('button.edit')</span>
 							@endif
 							
-							@if ($canDelete)
+							@if (Sentry::getUser()->hasAccess('account.delete'))
 								<button type="button" class="btn btn-xs btn-danger">@lang('button.delete')</button>
 							@else
 								<span class="btn btn-xs btn-danger disabled">@lang('button.delete')</span>

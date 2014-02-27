@@ -126,4 +126,8 @@ Route::filter('csrf', function()
 	{
 		throw new Illuminate\Session\TokenMismatchException;
 	}
+	
+	$_token = str_random(40);
+	Input::merge(compact('_token'));
+	Session::put('_token', $_token);
 });

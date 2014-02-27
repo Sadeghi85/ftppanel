@@ -17,6 +17,11 @@ Route::get('/', function()
 	return Redirect::to(Session::get('loginRedirect', route('overview.index')));
 });
 
+Route::get('keepalive', array('as' => 'keepalive', function()
+{
+	return;
+}));
+
 Route::group(array('before' => 'auth.sentry.root'), function()
 {
 	// Group

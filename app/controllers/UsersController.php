@@ -221,13 +221,13 @@ class UsersController extends RootController {
 		$selectedPermissions = $user->getPermissions();
 		$this->encodePermissions($selectedPermissions);
 		
-		$selectedPermissions = array_merge($selectedPermissions, Input::old('permissions', array()));
+		$selectedPermissions = array_replace($selectedPermissions, Input::old('permissions', array()));
 		
 		// Get all the available groups
 		$allGroups = Sentry::getGroupProvider()->findAll();
 
 		// Get this user groups
-		$selectedGroups = array_merge($user->getGroups()->lists('id'), Input::old('groups', array()));
+		$selectedGroups = array_replace($user->getGroups()->lists('id'), Input::old('groups', array()));
 		
 		$indexPage = '';
 		if (preg_match('#page=(\d+)#', URL::previous(), $matches))
