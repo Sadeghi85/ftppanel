@@ -114,56 +114,25 @@ class AccountsController extends AuthorizedController {
 			'ip'   => implode("\r\n", array_unique(array_filter(array_map('trim', explode("\r\n",str_replace(' ', '', Input::get('ip'))))))),
 		));
 
-		// Create a new validator instance from our validation rules
-		$validator = Validator::make(Input::all(), $this->validationRules);
-
-		// If validation fails, we'll exit the operation now.
-		if ($validator->fails())
+		$accountInstance = new Account;
+		
+		if ($accountInstance->validationFails())
 		{
 			// Ooops.. something went wrong
-			return Redirect::back()->withInput(Input::except('password', 'password_confirmation'))->withErrors($validator);
+			return Redirect::back()->withInput(Input::except('password', 'password_confirmation'))->withErrors($accountInstance->getValidator());
 		}
-
-		$users = Input::get('users', array());
-		$username = Input::get('username');
-		$password = Input::get('password');
-		$home = Input::get('home');
-		$ipCollection = array_filter(explode("\r\n", Input::get('ip')));
-		$ulbandwidth = (int) Input::get('ulbandwidth');
-		$dlbandwidth = (int) Input::get('dlbandwidth');
-		$quotasize = (int) Input::get('quotasize');
-		$quotafiles = (int) Input::get('quotafiles');
-		$comment = Input::get('comment');
-		$activated = (int) Input::get('activated', 0);
-
+		
 		// Saving Account
-		try
-		{
-			$account = new Account(array(
-				'username' => $username,
-				'home' => Config::get('ftppanel.ftpHome').'/'.$home,
-				'ulbandwidth' => $ulbandwidth,
-				'dlbandwidth' => $dlbandwidth,
-				'quotasize' => $quotasize,
-				'quotafiles' => $quotafiles,
-				'comment' => e($comment),
-				'activated' => $activated,
-			));
-
-			$account->password = sha1($password);
-
-			$account->save();
-		}
-		catch (\Exception $e)
+		if ( ! $accountInstance->store())
 		{
 			return Redirect::route('accounts.index')->with('error', Lang::get('accounts/messages.error.create'));
 		}
 
 		// Attaching Related Model for IP
-		$account->insertIp($ipCollection);
+		$accountInstance->storeIp();
 
 		// Attaching Related Model for User
-		$account->insertUser($users);
+		$accountInstance->storeUser();
 
 		// Redirect to the user page
 		return Redirect::route('accounts.index', array('page' => input::get('indexPage', 1)))->with('success',
@@ -178,34 +147,35 @@ class AccountsController extends AuthorizedController {
 	 */
 	public function edit($id)
 	{
-		if ( ! (Group::isRoot() or Sentry::getUser()->hasAccess('account.edit')))
+		if ( ! Sentry::getUser()->hasAccess('account.edit'))
 		{
 			App::abort(403);
 		}
+		
+		$account = Account::find($id);
 
-		$users = $selectedUsers = '';
-
-		if (Group::isRoot())
+		if ( ! $account)
 		{
-			// Get all the available users
-			$users = Sentry::getUserProvider()->findAll();
-
-			// Selected users
-			$selectedUsers = Input::old('users', array());
-
-			if (empty($selectedUsers))
-			{
-				$account = Account::find($id);
-
-				if ( ! $account)
-				{
-					return Redirect::route('accounts.index')->with('error', Lang::get('accounts/messages.error.account_not_found', compact('id')));
-				}
-
-				$selectedUsers = $account->users()->lists('id');
-			}
+			return Redirect::route('accounts.index')->with('error', Lang::get('accounts/messages.error.account_not_found', compact('id')));
 		}
-
+		
+		$allUsers = $selectedUsers = '';
+		
+		if (Sentry::getUser()->isSuperUser())
+		{
+			// Get all the available users except superusers
+			$allUsers = array_filter(
+							Sentry::getUserProvider()->findAll(),
+							function($user)
+							{
+								return ! $user->hasAccess('superuser');
+							}
+						);
+			
+			// Selected users
+			$selectedUsers = Input::old('users', $account->users()->lists('id'));
+		}
+		
 		$indexPage = '';
 		if (preg_match('#page=(\d+)#', URL::previous(), $matches))
 		{
@@ -213,7 +183,7 @@ class AccountsController extends AuthorizedController {
 		}
 
 		// Show the page
-		return View::make('app.accounts.edit', compact('users', 'selectedUsers', 'indexPage'));
+		return View::make('app.accounts.edit', compact('account', 'allUsers', 'selectedUsers', 'indexPage'));
 	}
 
 	/**
@@ -224,7 +194,20 @@ class AccountsController extends AuthorizedController {
 	 */
 	public function update($id)
 	{
-		//
+		if ( ! Sentry::getUser()->hasAccess('account.edit'))
+		{
+			App::abort(403);
+		}
+		
+		$account = Account::find($id);
+
+		if ( ! $account)
+		{
+			return Redirect::route('accounts.index')->with('error', Lang::get('accounts/messages.error.account_not_found', compact('id')));
+		}
+		
+		
+		
 	}
 
 	/**
@@ -235,11 +218,11 @@ class AccountsController extends AuthorizedController {
 	 */
 	public function destroy($id)
 	{
-		if ( ! (Group::isRoot() or Sentry::getUser()->hasAccess('account.delete')))
+		if ( ! Sentry::getUser()->hasAccess('account.delete')))
 		{
 			App::abort(403);
 		}
-
+		
 		$account = Account::find($id);
 
 		if ( ! $account)

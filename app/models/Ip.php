@@ -40,7 +40,7 @@ class Ip extends Eloquent {
 		$formattedIp = trim($formattedIp);
 
 		if ($formattedIp == '0.0.0.0-255.255.255.255')
-			$formattedIp = Lang::get('general.unlimited');
+			$formattedIp = '';
 
 		return $formattedIp;
 	}

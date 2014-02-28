@@ -17,10 +17,10 @@ class Group extends SentryGroupModel {
 	
 	private $validator;
 	
-	public function validationPasses($inputs)
+	public function validationPasses()
     {
         // make a new validator object
-        $v = Validator::make($inputs, $this->validationRules);
+        $v = Validator::make(Input::all(), $this->validationRules);
 
         // check for failure
         if ($v->fails())
@@ -34,9 +34,9 @@ class Group extends SentryGroupModel {
         return true;
     }
 	
-	public function validationFails($inputs)
+	public function validationFails()
 	{
-		return ( ! $this->validationPasses($inputs));
+		return ( ! $this->validationPasses());
 	}
 	
 	public function getValidator()

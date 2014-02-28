@@ -47,7 +47,7 @@ class GroupsController extends RootController {
 	{
 		$groupInstance = new Group;
 		
-		if ($groupInstance->validationFails(Input::all()))
+		if ($groupInstance->validationFails())
 		{
 			// Ooops.. something went wrong
 			return Redirect::back()->withInput()->withErrors($groupInstance->getValidator());
@@ -199,7 +199,7 @@ class GroupsController extends RootController {
 			'name' => 'required|between:3,127|alpha_dash|unique:groups,name,'.$id,
 		));
 		
-		if ($group->validationFails(Input::all()))
+		if ($group->validationFails())
 		{
 			// Ooops.. something went wrong
 			return Redirect::back()->withInput()->withErrors($group->getValidator());

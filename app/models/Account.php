@@ -33,10 +33,10 @@ class Account extends Eloquent {
 	
 	private $validator;
 	
-	public function validationPasses($inputs)
+	public function validationPasses()
     {
         // make a new validator object
-        $v = Validator::make($inputs, $this->validationRules);
+        $v = Validator::make(Input::all(), $this->validationRules);
 
         // check for failure
         if ($v->fails())
@@ -50,9 +50,9 @@ class Account extends Eloquent {
         return true;
     }
 	
-	public function validationFails($inputs)
+	public function validationFails()
 	{
-		return ( ! $this->validationPasses($inputs));
+		return ( ! $this->validationPasses());
 	}
 	
 	public function getValidator()
@@ -93,73 +93,96 @@ class Account extends Eloquent {
 		return $query->where('activated', '=', 1);
 	}
 
-	public function insertUser($users)
+	public function store()
 	{
-		if (Group::isRoot())
+		$inputs = Input::only('username', 'ulbandwidth', 'dlbandwidth', 'quotasize', 'quotafiles', 'comment');
+		$inputs['home'] = Config::get('ftppanel.ftpHome').'/'.Input::get('home');
+		$inputs['activated'] = (int) Input::get('activated', 0);
+		
+		try
+		{
+			foreach ($inputs as $column => $value)
+			{
+				$this->$column = $value;
+			}
+
+			$this->password = sha1(Input::get('password'));
+
+			$this->save();
+		}
+		catch (\Exception $e)
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public function storeUser()
+	{
+		$users = Input::get('users', array());
+		
+		if (empty($users))
+		{
+			$this->users()->attach(Sentry::getId());
+		}
+		
+		if (Sentry::getUser()->isSuperUser())
 		{
 			foreach ($users as $userId)
 			{
-				try
-				{
-					$this->users()->attach($userId);
-				}
-				catch (\Exception $e)
-				{
-
-				}
+				$this->users()->attach($userId);
 			}
-		}
-		else
-		{
-			$this->users()->attach(Sentry::getUser()->id);
 		}
 	}
 
-	public function insertIp(array $ipCollection)
+	public function storeIp()
 	{
-		$ipCollection = array_filter($ipCollection);
-
-		foreach($ipCollection as $ipRange)
-		{
-			$ipSegments = explode('-', $ipRange);
-
-			if (count($ipSegments) == 2)
-			{
-				$ip_start = sprintf('%u', ip2long($ipSegments[0]));
-				$ip_end = sprintf('%u', ip2long($ipSegments[1]));
-
-				if ($ip_start > $ip_end)
-				{
-					list($ip_start, $ip_end) = array($ip_end, $ip_start);
-				}
-
-				$ip_start_for_humans = long2ip($ip_start);
-				$ip_end_for_humans = long2ip($ip_end);
-			}
-			else
-			{
-				$ip_start_for_humans = $ipSegments[0];
-				$ip_end_for_humans = $ip_start_for_humans;
-
-				$ip_start = sprintf('%u', ip2long($ip_start_for_humans));
-				$ip_end = $ip_start;
-			}
-
-			$ip = new Ip(array(
-				'ip_start' => $ip_start,
-				'ip_end' => $ip_end,
-				'ip_start_for_humans' => $ip_start_for_humans,
-				'ip_end_for_humans' => $ip_end_for_humans,
-			));
-
-			$this->ip()->save($ip);
-		}
+		$ipCollection = array_filter(explode("\r\n", Input::get('ip', '')));
 
 		if (empty($ipCollection))
 		{
 			$ip = new Ip();
 
 			$this->ip()->save($ip);
+		}
+		else
+		{
+			foreach($ipCollection as $ipRange)
+			{
+				$ipSegments = explode('-', $ipRange);
+
+				if (count($ipSegments) == 2)
+				{
+					$ip_start = sprintf('%u', ip2long($ipSegments[0]));
+					$ip_end = sprintf('%u', ip2long($ipSegments[1]));
+
+					if ($ip_start > $ip_end)
+					{
+						list($ip_start, $ip_end) = array($ip_end, $ip_start);
+					}
+
+					$ip_start_for_humans = long2ip($ip_start);
+					$ip_end_for_humans = long2ip($ip_end);
+				}
+				else
+				{
+					$ip_start_for_humans = $ipSegments[0];
+					$ip_end_for_humans = $ip_start_for_humans;
+
+					$ip_start = sprintf('%u', ip2long($ip_start_for_humans));
+					$ip_end = $ip_start;
+				}
+
+				$ip = new Ip(array(
+					'ip_start' => $ip_start,
+					'ip_end' => $ip_end,
+					'ip_start_for_humans' => $ip_start_for_humans,
+					'ip_end_for_humans' => $ip_end_for_humans,
+				));
+
+				$this->ip()->save($ip);
+			}
 		}
 	}
 

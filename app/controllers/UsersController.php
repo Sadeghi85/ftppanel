@@ -72,7 +72,7 @@ class UsersController extends RootController {
 	{
 		$userInstance = new User;
 		
-		if ($userInstance->validationFails(Input::all()))
+		if ($userInstance->validationFails())
 		{
 			// Ooops.. something went wrong
 			return Redirect::back()->withInput(Input::except('password', 'password_confirmation'))->withErrors($userInstance->getValidator());
@@ -274,7 +274,7 @@ class UsersController extends RootController {
 			'password_confirmation'  => 'between:3,32|same:password',
 		));
 		
-		if ($user->validationFails(Input::all()))
+		if ($user->validationFails())
 		{
 			// Ooops.. something went wrong
 			return Redirect::back()->withInput(Input::except('password', 'password_confirmation'))->withErrors($user->getValidator());

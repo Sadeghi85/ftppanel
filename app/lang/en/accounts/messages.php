@@ -89,8 +89,19 @@ return array(
 		
 		'back' => 'Back',
 		
-		'name' => 'Name',
-		'alias' => 'Alias',
+		'password' => 'Password',
+		'password_confirmation' => 'Confirm Password',
+
+		'username' => 'Username',
+		'home' => 'Home',
+		'ip' => 'IP',
+		'comment' => 'Comment',
+		'ulbandwidth' => 'Upload Bandwidth',
+		'dlbandwidth' => 'Download Bandwidth',
+		'quotasize' => 'Quota Size',
+		'quotafiles' => 'Quota Files',
+		'activated' => 'Activate',
+		'users' => 'Users',
 		
 	),
 );

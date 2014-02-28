@@ -50,7 +50,10 @@ App::fatal(function($exception)
 {
 	Log::error($exception);
 	
-    return Response::make(View::make('error/500'), 500);
+	if ( ! Config::get('app.debug'))
+	{
+		return Response::make(View::make('error/500'), 500);
+	}
 });
 
 App::error(function(Exception $exception, $code)

@@ -28,10 +28,10 @@ class User extends SentryUserModel {
 	
 	private $validator;
 	
-	public function validationPasses($inputs)
+	public function validationPasses()
     {
         // make a new validator object
-        $v = Validator::make($inputs, $this->validationRules);
+        $v = Validator::make(Input::all(), $this->validationRules);
 
         // check for failure
         if ($v->fails())
@@ -45,9 +45,9 @@ class User extends SentryUserModel {
         return true;
     }
 	
-	public function validationFails($inputs)
+	public function validationFails()
 	{
-		return ( ! $this->validationPasses($inputs));
+		return ( ! $this->validationPasses());
 	}
 	
 	public function getValidator()

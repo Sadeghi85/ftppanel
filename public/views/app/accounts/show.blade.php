@@ -61,7 +61,7 @@
 				<td>@lang('accounts/messages.show.comment')</td>
 				<td>
 					@if ($account->comment)
-						<pre><code>{{ $account->comment }}</code></pre>
+						<pre><code>{{{ $account->comment }}}</code></pre>
 					@endif
 				</td>
 			</tr>
@@ -69,7 +69,7 @@
 				<td>@lang('accounts/messages.show.ip')</td>
 				<td>
 					@if ($account->ip)
-						<pre><code>{{ Ip::formatForHumans($account->ip) }}</code></pre>
+						<pre><code>{{ (Ip::formatForHumans($account->ip) ?: Lang::get('general.unlimited')) }}</code></pre>
 					@endif
 				</td>
 			</tr>
