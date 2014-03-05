@@ -157,25 +157,11 @@ class UsersController extends RootController {
 	/**
 	 * Display the specified resource.
 	 *
-	 * @param  int  $id
+	 * @param  model  $model
 	 * @return Response
 	 */
-	public function show($id)
+	public function show($user)
 	{
-		try
-		{
-			// Get the user information
-			$user = Sentry::getUserProvider()->findById($id);
-		}
-		catch (UserNotFoundException $e)
-		{
-			// Prepare the error message
-			$error = Lang::get('users/messages.error.user_not_found', compact('id'));
-			
-			// Redirect to the groups management page
-			return Redirect::route('users.index')->with('error', $error);
-		}
-
 		$allPermissions = Config::get('permissions');
 		$selectedPermissions = $user->getMergedPermissions();
 		
@@ -187,29 +173,11 @@ class UsersController extends RootController {
 	/**
 	 * Show the form for editing the specified resource.
 	 *
-	 * @param  int  $id
+	 * @param  model  $model
 	 * @return Response
 	 */
-	public function edit($id)
+	public function edit($user)
 	{
-		// Disallow editing root
-		if ($id == 1)
-			App::abort('403');
-		
-		try
-		{
-			// Get the user information
-			$user = Sentry::getUserProvider()->findById($id);
-		}
-		catch (UserNotFoundException $e)
-		{
-			// Prepare the error message
-			$error = Lang::get('users/messages.error.user_not_found', compact('id'));
-
-			// Redirect to the user management page
-			return Redirect::route('users.index')->with('error', $error);
-		}
-
 		// Get all the available permissions
 		$allPermissions = Config::get('permissions');
 		$this->encodeAllPermissions($allPermissions, true);
@@ -242,29 +210,11 @@ class UsersController extends RootController {
 	/**
 	 * Update the specified resource in storage.
 	 *
-	 * @param  int  $id
+	 * @param  model  $model
 	 * @return Response
 	 */
-	public function update($id)
+	public function update($user)
 	{
-		// Disallow editing root
-		if ($id == 1)
-			App::abort('403');
-		
-		try
-		{
-			// Get the user information
-			$user = Sentry::getUserProvider()->findById($id);
-		}
-		catch (UserNotFoundException $e)
-		{
-			// Prepare the error message
-			$error = Lang::get('users/messages.error.user_not_found', compact('id'));
-
-			// Redirect to the user management page
-			return Redirect::route('users.index')->with('error', $error);
-		}
-
 		//$usernameToLog = $user->usernameWithFullName();
 		
 		// Validation
@@ -376,55 +326,28 @@ class UsersController extends RootController {
 	/**
 	 * Remove the specified resource from storage.
 	 *
-	 * @param  int  $id
+	 * @param  model  $model
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy($user)
 	{
-		// Disallow deleting root
-		if ($id == 1)
-			App::abort('403');
-		
-		try
-		{
-			// Get user information
-			$user = Sentry::getUserProvider()->findById($id);
+		// Delete the user
+		$user->delete();
 
-			// Check if we are not trying to delete ourself
-			if ($user->id === Sentry::getId())
-			{
-				// Prepare the error message
-				$error = Lang::get('users/messages.error.delete');
+		// Log
+		// $usernameToLog = $user->usernameWithFullName();
+		// $currentUserUsername = Sentry::getUser()->usernameWithFullName();
+		// $myLog = new MyLog;
+		// $myLog->insertLog(
+			// array(
+					// 'description' => sprintf('User [%s] has deleted the User [%s].', $currentUserUsername, $usernameToLog),
+					// 'user_id'     => Sentry::getUser()->id,
+					// 'domain_id'   => null,
+					// 'event'       => 'Delete User',
+					// 'type'        => 'warning',
+			// )
+		// );
 
-				// Redirect to the user management page
-				return Redirect::back()->with('error', $error);
-			}
-
-			// Delete the user
-			$user->delete();
-
-			// Log
-			// $usernameToLog = $user->usernameWithFullName();
-			// $currentUserUsername = Sentry::getUser()->usernameWithFullName();
-			// $myLog = new MyLog;
-			// $myLog->insertLog(
-				// array(
-						// 'description' => sprintf('User [%s] has deleted the User [%s].', $currentUserUsername, $usernameToLog),
-						// 'user_id'     => Sentry::getUser()->id,
-						// 'domain_id'   => null,
-						// 'event'       => 'Delete User',
-						// 'type'        => 'warning',
-				// )
-			// );
-		}
-		catch (UserNotFoundException $e)
-		{
-			// Prepare the error message
-			$error = Lang::get('users/messages.user_not_found', compact('id' ));
-
-			// Redirect to the user management page
-			return Redirect::back()->with('error', $error);
-		}
 		
 		// Prepare the success message
 		$success = Lang::get('users/messages.success.delete');

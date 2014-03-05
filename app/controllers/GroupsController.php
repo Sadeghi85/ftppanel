@@ -106,25 +106,11 @@ class GroupsController extends RootController {
 	/**
 	 * Display the specified resource.
 	 *
-	 * @param  int  $id
+	 * @param  model  $model
 	 * @return Response
 	 */
-	public function show($id)
+	public function show($group)
 	{
-		try
-		{
-			// Get the group information
-			$group = Sentry::getGroupProvider()->findById($id);
-		}
-		catch (GroupNotFoundException $e)
-		{
-			// Prepare the error message
-			$error = Lang::get('groups/messages.error.group_not_found', compact('id'));
-			
-			// Redirect to the groups management page
-			return Redirect::route('groups.index')->with('error', $error);
-		}
-
 		$allPermissions = Config::get('permissions');
 		$selectedPermissions = $group->permissions;
 		
@@ -134,29 +120,11 @@ class GroupsController extends RootController {
 	/**
 	 * Show the form for editing the specified resource.
 	 *
-	 * @param  int  $id
+	 * @param  model  $model
 	 * @return Response
 	 */
-	public function edit($id)
+	public function edit($group)
 	{
-		// Disallow editing root
-		if ($id == 1)
-			App::abort('403');
-		
-		try
-		{
-			// Get the group information
-			$group = Sentry::getGroupProvider()->findById($id);
-		}
-		catch (GroupNotFoundException $e)
-		{
-			// Prepare the error message
-			$error = Lang::get('groups/messages.error.group_not_found', compact('id'));
-			
-			// Redirect to the groups management page
-			return Redirect::route('groups.index')->with('error', $error);
-		}
-		
 		// Get all the available permissions
 		$allPermissions = Config::get('permissions');
 		$this->encodeAllPermissions($allPermissions, true);
@@ -174,26 +142,11 @@ class GroupsController extends RootController {
 	/**
 	 * Update the specified resource in storage.
 	 *
-	 * @param  int  $id
+	 * @param  model  $model
 	 * @return Response
 	 */
-	public function update($id)
+	public function update($group)
 	{
-		// Disallow editing root
-		if ($id == 1)
-			App::abort('403');
-		
-		try
-		{
-			// Get the group information
-			$group = Sentry::getGroupProvider()->findById($id);
-		}
-		catch (GroupNotFoundException $e)
-		{
-			// Redirect to the groups management page
-			return Rediret::route('groups.index')->with('error', Lang::get('groups/messages.error.group_not_found', compact('id')));
-		}
-
 		// Validation
 		$group->setValidationRules(array(
 			'name' => 'required|between:3,127|alpha_dash|unique:groups,name,'.$id,
@@ -264,42 +217,22 @@ class GroupsController extends RootController {
 	/**
 	 * Remove the specified resource from storage.
 	 *
-	 * @param  int  $id
+	 * @param  model  $model
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy($group)
 	{
-		// Disallow deleting root
-		if ($id == 1)
-			App::abort('403');
-			
-		try
+		// Log all this group's users out
+		$users = Sentry::findAllUsersInGroup($group);
+		
+		foreach ($users as $user)
 		{
-			// Get group information
-			$group = Sentry::getGroupProvider()->findById($id);
-			
-			// Log all this group's users out
-			$users = Sentry::findAllUsersInGroup($group);
-			
-			foreach ($users as $user)
-			{
-				$user->persist_code = null;
-				$user->save();
-			}
-			
-			// Delete the group
-			$group->delete();
-		}
-		catch (GroupNotFoundException $e)
-		{
-			// Prepare the error message
-			$error = Lang::get('groups/messages.error.group_not_found', compact('id'));
-			
-			// Redirect to the group management page
-			return Redirect::back()->with('error', $error);
+			$user->persist_code = null;
+			$user->save();
 		}
 		
-		
+		// Delete the group
+		$group->delete();
 		
 		// Log
 		// $currentUserUsername = Sentry::getUser()->usernameWithFullName();

@@ -35,26 +35,11 @@ class AccountsController extends AuthorizedController {
 	/**
 	 * Display the specified resource.
 	 *
-	 * @param  int  $id
+	 * @param  model  $model
 	 * @return Response
 	 */
-	public function show($id)
+	public function show($account)
 	{
-		if (Sentry::getUser()->isSuperUser())
-		{
-			$account = Account::with('ip')->find($id);
-		}
-		else
-		{
-			$account = Sentry::getUser()->accounts()->with('ip')->find($id);
-		}
-
-		if ( ! $account)
-		{
-			return Redirect::route('accounts.index')->with('error', Lang::get('accounts/messages.error.account_not_found',
-				compact('id')));
-		}
-
 		return View::make('app.accounts.show', compact('account'));
 	}
 
@@ -142,21 +127,14 @@ class AccountsController extends AuthorizedController {
 	/**
 	 * Show the form for editing the specified resource.
 	 *
-	 * @param  int  $id
+	 * @param  model  $model
 	 * @return Response
 	 */
-	public function edit($id)
+	public function edit($account)
 	{
 		if ( ! Sentry::getUser()->hasAccess('account.edit'))
 		{
 			App::abort(403);
-		}
-		
-		$account = Account::find($id);
-
-		if ( ! $account)
-		{
-			return Redirect::route('accounts.index')->with('error', Lang::get('accounts/messages.error.account_not_found', compact('id')));
 		}
 		
 		$allUsers = $selectedUsers = '';
@@ -189,23 +167,16 @@ class AccountsController extends AuthorizedController {
 	/**
 	 * Update the specified resource in storage.
 	 *
-	 * @param  int  $id
+	 * @param  model  $model
 	 * @return Response
 	 */
-	public function update($id)
+	public function update($account)
 	{
 		if ( ! Sentry::getUser()->hasAccess('account.edit'))
 		{
 			App::abort(403);
 		}
-		
-		$account = Account::find($id);
 
-		if ( ! $account)
-		{
-			return Redirect::route('accounts.index')->with('error', Lang::get('accounts/messages.error.account_not_found', compact('id')));
-		}
-		
 		
 		
 	}
@@ -213,22 +184,14 @@ class AccountsController extends AuthorizedController {
 	/**
 	 * Remove the specified resource from storage.
 	 *
-	 * @param  int  $id
+	 * @param  model  $model
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy($account)
 	{
-		if ( ! Sentry::getUser()->hasAccess('account.delete')))
+		if ( ! Sentry::getUser()->hasAccess('account.delete'))
 		{
 			App::abort(403);
-		}
-		
-		$account = Account::find($id);
-
-		if ( ! $account)
-		{
-			return Redirect::route('accounts.index')->with('error', Lang::get('accounts/messages.error.account_not_found',
-				compact('id')));
 		}
 
 		$account->delete();

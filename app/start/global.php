@@ -84,6 +84,11 @@ App::error(function(Illuminate\Session\TokenMismatchException $exception, $code)
     return Response::make(View::make('error/token_mismatch'), 403);
 });
 
+App::error(function(Illuminate\Database\Eloquent\ModelNotFoundException $exception, $code)
+{
+    return Response::make(View::make('error/404'), 404);
+});
+
 App::missing(function($exception)
 {
     return Response::make(View::make('error/404'), 404);
