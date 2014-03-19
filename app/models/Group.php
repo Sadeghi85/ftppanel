@@ -48,4 +48,24 @@ class Group extends SentryGroupModel {
     {
         $this->validationRules = array_replace($this->validationRules, $newRules);
     }
+	
+	/**
+	 * One to many relationship.
+	 *
+	 * @return Model
+	 */
+	public function logs()
+    {
+        return $this->hasMany('PanelLog', 'group_id');
+    }
+	
+	/**
+	 * Returns the relationship between groups and users.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+	 */
+	public function users()
+	{
+		return $this->belongsToMany('User', 'group_user', 'group_id', 'user_id');
+	}
 }

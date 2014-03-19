@@ -61,6 +61,26 @@ class User extends SentryUserModel {
     }
 	
 	/**
+	 * One to many relationship.
+	 *
+	 * @return Model
+	 */
+	public function logs()
+    {
+        return $this->hasMany('PanelLog', 'user_id');
+    }
+	
+	/**
+	 * Returns the relationship between groups and users.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+	 */
+	public function groups()
+	{
+		return $this->belongsToMany('Group', 'group_user', 'user_id', 'group_id');
+	}
+	
+	/**
 	 * Many to many relationship.
 	 *
 	 * @return Model
@@ -70,16 +90,6 @@ class User extends SentryUserModel {
 		// Second argument is the name of pivot table.
 		// Third & forth arguments are the names of foreign keys.
         return $this->belongsToMany('Account', 'account_user', 'user_id', 'account_id')->withTimestamps();
-    }
-
-	/**
-	 * One to many relationship.
-	 *
-	 * @return Model
-	 */
-	public function logs()
-    {
-        return $this->hasMany('MyLog', 'user_id');
     }
 	
 	/**

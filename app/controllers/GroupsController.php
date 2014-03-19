@@ -58,8 +58,9 @@ class GroupsController extends RootController {
 		$permissions = Input::get('permissions', array());
 		$this->decodePermissions($permissions);
 		
-		if ( ! json_encode($permissions))
+		if ( ! json_encode($permissions)) {
 			return Redirect::back()->withInput()->with('error', 'Invalid form data.');
+		}
 
 		try
 		{
@@ -68,20 +69,17 @@ class GroupsController extends RootController {
 
 			// Was the group created?
 			if ($group = Sentry::getGroupProvider()->create($inputs))
-			{				
+			{
 				// Log
-				// $groupNameToLog = $group->name;
-				// $currentUserUsername = Sentry::getUser()->usernameWithFullName();
-				// $myLog = new MyLog;
-				// $myLog->insertLog(
-					// array(
-							// 'description' => sprintf('User [%s] has edited the Group [%s].%sCurrent Status:%s%s', $currentUserUsername, $groupNameToLog, "\r\n\r\n", "\r\n\r\n", print_r($group->toArray(), true)),
-							// 'user_id'     => Sentry::getUser()->id,
-							// 'domain_id'   => null,
-							// 'event'       => 'Create Group',
-							// 'type'        => 'info',
-					// )
-				// );
+				PanelLog::success(
+					array(
+							'user_id'      => Sentry::getUser()->id,
+							'user_object'  => serialize(Sentry::getUser()),
+							'group_id'     => $group->id,
+							'group_object' => serialize($group),
+							'event'        => Config::get('panel_log.log_types.create_group'),
+							'description'  => '',
+				));
 				
 				// Redirect to the group management page
 				return Redirect::route('groups.index')->with('success', Lang::get('groups/messages.success.create'));
@@ -149,7 +147,7 @@ class GroupsController extends RootController {
 	{
 		// Validation
 		$group->setValidationRules(array(
-			'name' => 'required|between:3,127|alpha_dash|unique:groups,name,'.$id,
+			'name' => 'required|between:3,127|alpha_dash|unique:groups,name,'.$group->id,
 		));
 		
 		if ($group->validationFails())

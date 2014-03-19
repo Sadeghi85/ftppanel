@@ -20,6 +20,12 @@ Route::get('/', function()
 	return Redirect::to(Session::get('loginRedirect', route('overview.index')));
 });
 
+Route::get('ser', array('as' => 'ser', function()
+{
+	$a = unserialize(PanelLog::find(7)->description);
+	return var_dump($a->groups->lists('name'));
+}));
+
 Route::get('keepalive', array('as' => 'keepalive', function()
 {
 	return;
@@ -32,19 +38,10 @@ Route::group(array('before' => 'auth.sentry.root'), function()
 		// Disallow edit, update and delete root group
 		if ($route->getName() != 'groups.show' and ($id == 1 or  in_array($id, Sentry::getUser()->getGroups()->lists('id'))))
 		{
-			App::abort('403');
+			App::abort(403);
 		}
 		
-		try
-		{
-			$group = Sentry::getGroupProvider()->findById($id);
-		}
-		catch (GroupNotFoundException $e)
-		{
-			App::abort(404);
-		}
-		
-		return $group;
+		return Sentry::getGroupProvider()->createModel()->findOrFail($id);
 	});
 	Route::resource('groups', 'GroupsController');
 	
@@ -53,19 +50,10 @@ Route::group(array('before' => 'auth.sentry.root'), function()
 		// Disallow edit, update and delete root user
 		if ($route->getName() != 'users.show' and ($id == 1 or $id == Sentry::getUser()->id))
 		{
-			App::abort('403');
+			App::abort(403);
 		}
 		
-		try
-		{
-			$user = Sentry::getUserProvider()->findById($id);
-		}
-		catch (UserNotFoundException $e)
-		{
-			App::abort(404);
-		}
-		
-		return $user;
+		return Sentry::getUser()->findOrFail($id);
 	});
 	Route::resource('users', 'UsersController');
 });
@@ -77,29 +65,19 @@ Route::group(array('before' => 'auth.sentry'), function()
 	
 	// Account
 	Route::bind('accounts', function($id, $route) {
-		if ($route->getName() == 'accounts.show')
+		if (Sentry::getUser()->isSuperUser())
 		{
-			if (Sentry::getUser()->isSuperUser())
-			{
-				$account = Account::with('ip')->find($id);
-			}
-			else
-			{
-				$account = Sentry::getUser()->accounts()->with('ip')->find($id);
-			}
-			
-			if ( ! $account)
-				App::abort('404');
-			
-			return $account;
+			return Account::findOrFail($id);
 		}
-		
-		return Account::findOrFail($id);
+		else
+		{
+			return Sentry::getUser()->accounts()->findOrFail($id);
+		}
 	});
 	Route::resource('accounts', 'AccountsController');
 
 	// Log
-	Route::resource('logs', 'LogsController', array('only' => array('index', 'show', 'destroy')));
+	Route::resource('logs', 'PanelLogsController', array('only' => array('index', 'show', 'destroy')));
 
 	// Profile
 	Route::resource('profile', 'ProfileController', array('only' => array('index')));

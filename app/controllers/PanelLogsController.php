@@ -1,6 +1,6 @@
 <?php
 
-class LogsController extends AuthorizedController {
+class PanelLogsController extends AuthorizedController {
 
 	/**
 	 * Initializer.
@@ -19,44 +19,35 @@ class LogsController extends AuthorizedController {
 	 * @return Response
 	 */
 	public function index()
-	{	
-		// $item_ids = DB::table('category_item')->where('category_id', '=', $category_id)->get('item_id');
-		// $item_ids = array_map(function($arr){ return $arr->item_id; }, $item_ids);
-		// $items = Item::where_in('id', $item_ids)->paginate(10);
-
-		
-		if (Group::isRoot())
+	{
+		if (Sentry::getUser()->isSuperUser() or Sentry::getUser()->hasAccess('log.superusers'))
 		{
-			// Grab all the logs
-			$logs = MyLog::newest()->with('site', 'user')->paginate();
+			// Grab all the logs including superusers
+			$logs = PanelLog::with('account', 'group', 'user')->newest()->paginate();
+		}
+		elseif (Sentry::getUser()->hasAccess('log.users'))
+		{
+			// Grab all the logs for users except superusers
+			$userIDs = array_map(function ($model) {
+				return $model->id;
+			}, array_filter(Sentry::getUserProvider()->findAll(), function ($user) {
+				return ! $user->isSuperUser();
+			}));
+
+			$logs = PanelLog::whereIn('user_id', $userIDs)->with('account', 'group', 'user')->newest()->paginate();
+		}
+		elseif (Sentry::getUser()->hasAccess('log.own'))
+		{
+			// Grab all the logs for this user only
+			$logs = PanelLog::where('user_id', '=', Sentry::getUser()->id)->with('account', 'group', 'user')->newest()->paginate();
 		}
 		else
 		{
-			if (Sentry::getUser()->hasAccess('log.all'))
-			{
-				// Grab all the logs including Root
-				$logs = MyLog::newest()->with('site', 'user')->paginate();
-			}
-			elseif (Sentry::getUser()->hasAccess('log.nonroot'))
-			{
-				// Grab all the logs for users that belong to groups other than Root
-				$groupIDs = Sentry::getGroupProvider()->createModel()->where('name', '<>', 'Root')->lists('id');
-				$userIDs = DB::table('users_groups')->whereIn('group_id', $groupIDs)->lists('user_id');
-				$logs = MyLog::whereIn('user_id', $userIDs)->newest()->with('site', 'user')->paginate();
-			}
-			elseif (Sentry::getUser()->hasAccess('log.self'))
-			{
-				// Grab all the logs for this user only
-				$logs = MyLog::where('user_id', '=', Sentry::getUser()->id)->newest()->with('site', 'user')->paginate();
-			}
-			else
-			{
-				App::abort(403);
-			}
+			App::abort(403);
 		}
-		
+
 		// Show the page
-		return View::make('app.logs.index', compact('logs'));
+		return View::make('app.panel_logs.index', compact('logs'));
 	}
 
 	/**

@@ -2,6 +2,12 @@
 
 return array(
 
+	'events' => array(
+		'unknown'      => 'Unknown',
+		'create_group' => 'Create Group',
+
+	),
+	
 	'error' => array(
 		'log_not_found' => 'Log [:id] does not exist.',
 		
@@ -18,7 +24,7 @@ return array(
 		'header' => 'Logs',
 		
 		'id' => 'Id',
-		'site' => 'Site',
+		'account' => 'Account',
 		'username' => 'Username',
 		'event' => 'Event',
 		'description' => 'Description',

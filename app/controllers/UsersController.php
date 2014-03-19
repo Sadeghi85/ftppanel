@@ -110,19 +110,14 @@ class UsersController extends RootController {
 				}
 
 				// Log
-				// $usernameToLog = $user->usernameWithFullName();
-				// $currentUserUsername = Sentry::getUser()->usernameWithFullName();
-				// $user->load('groups');
-				// $myLog = new MyLog;
-				// $myLog->insertLog(
-					// array(
-							// 'description' => sprintf('User [%s] has created the User [%s].%sCurrent Status:%s%s', $currentUserUsername, $usernameToLog, "\r\n\r\n", "\r\n\r\n", print_r($user->toArray(), true)),
-							// 'user_id'     => Sentry::getUser()->id,
-							// 'domain_id'   => null,
-							// 'event'       => 'Create User',
-							// 'type'        => 'info',
-					// )
-				// );
+				PanelLog::success(
+					array(
+							
+							'user_id'     => Sentry::getUser()->id,
+							'user_name'   => Sentry::getUser()->username,
+							'event'       => 'create_user',
+							'description' => serialize($user->load('groups')),
+				));
 
 				// Prepare the success message
 				$success = Lang::get('users/messages.success.create');
@@ -219,7 +214,7 @@ class UsersController extends RootController {
 		
 		// Validation
 		$user->setValidationRules(array(
-			'username' => 'required|between:3,127|alpha_dash|unique:users,username,'.$id,
+			'username' => 'required|between:3,127|alpha_dash|unique:users,username,'.$user->id,
 			'password'         => 'between:3,32|confirmed',
 			'password_confirmation'  => 'between:3,32|same:password',
 		));

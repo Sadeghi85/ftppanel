@@ -83,6 +83,16 @@ class Account extends Eloquent {
 	 *
 	 * @return Model
 	 */
+	public function logs()
+    {
+        return $this->hasMany('PanelLog', 'account_id');
+    }
+	
+	/**
+	 * One to many relationship.
+	 *
+	 * @return Model
+	 */
 	public function ip()
     {
         return $this->hasMany('Ip', 'account_id');
