@@ -177,6 +177,17 @@ Blade::extend(function($value)
 });
 
 /*
+|--------------------------
+| View Composers
+|--------------------------
+*/
+
+View::composer(Paginator::getViewName(), function($view) {
+	$queryString = array_except(Input::query(), Paginator::getPageName());
+	$view->paginator->appends($queryString);
+});
+
+/*
 |--------------------------------------------------------------------------
 | Global Constant
 |--------------------------------------------------------------------------
