@@ -54,8 +54,8 @@ return array(
 
 		'mysql' => array(
 			'driver'    => 'mysql',
-			'host'      => 'localhost:3307',
-			'database'  => 'webpanel',
+			'host'      => 'localhost:3306',
+			'database'  => 'ftppanel',
 			'username'  => 'root',
 			'password'  => 'centos',
 			'charset'   => 'utf8',

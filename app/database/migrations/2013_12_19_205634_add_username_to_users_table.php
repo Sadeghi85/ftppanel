@@ -35,7 +35,7 @@ class AddUsernameToUsersTable extends Migration {
 			//$table->dropColumn('username');
 			//$table->unique('email');
             
-            DB::statement('ALTER TABLE `users` MODIFY `email` VARCHAR(255) NOT NULL;');
+            //DB::statement('ALTER TABLE `users` MODIFY `email` VARCHAR(255) NOT NULL;');
  
         });
 	}
