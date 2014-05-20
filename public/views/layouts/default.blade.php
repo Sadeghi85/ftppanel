@@ -54,10 +54,13 @@
 
     <div class="navbar-collapse collapse">
 		<ul class="nav navbar-nav">
-		{{-- <li class="active"><a href="#">{{ Lang::get('site.accounts') }}</a></li> --}}
+		
+	@comment
 		<li class="{{ Route::currentRouteName() == 'profile.index' ? 'active' : '' }}">
 			<a href="{{ URL::Route('profile.index') }}">{{ Lang::get('profile/messages.profile') }}</a>
 		</li>
+	@endcomment
+	
 		<li><a href="{{ URL::Route('auth.logout') }}">{{ Lang::get('auth/messages.logout.logout') }}</a></li>
 		</ul>
     </div><!--/.nav-collapse -->

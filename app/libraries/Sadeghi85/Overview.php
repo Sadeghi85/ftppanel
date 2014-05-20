@@ -13,7 +13,7 @@ class Overview {
     	if (self::$initialized)
     		return;
 
-//        self::$memInfo = `sudo cat /proc/meminfo`;
+        self::$memInfo = `sudo cat /proc/meminfo`;
     	self::$initialized = true;
     }
 
@@ -22,6 +22,7 @@ class Overview {
 		self::initialize();
 
 		return `sudo pure-ftpwho`;
+		
 	}
 
 //	public static function getTotalMemory()

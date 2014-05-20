@@ -20,11 +20,11 @@ Route::get('/', function()
 	return Redirect::to(Session::get('loginRedirect', route('overview.index')));
 });
 
-Route::get('ser', array('as' => 'ser', function()
-{
-	$a = unserialize(PanelLog::find(7)->description);
-	return var_dump($a->groups->lists('name'));
-}));
+// Route::get('ser', array('as' => 'ser', function()
+// {
+	// $a = unserialize(PanelLog::find(7)->description);
+	// return var_dump($a->groups->lists('name'));
+// }));
 
 Route::get('keepalive', array('as' => 'keepalive', function()
 {
@@ -77,7 +77,7 @@ Route::group(array('before' => 'auth.sentry'), function()
 	Route::resource('accounts', 'AccountsController');
 
 	// Log
-	Route::resource('logs', 'PanelLogsController', array('only' => array('index', 'show', 'destroy')));
+	//Route::resource('logs', 'PanelLogsController', array('only' => array('index', 'show', 'destroy')));
 
 	// Profile
 	Route::resource('profile', 'ProfileController', array('only' => array('index')));

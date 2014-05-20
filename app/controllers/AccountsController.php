@@ -177,7 +177,36 @@ class AccountsController extends AuthorizedController {
 			App::abort(403);
 		}
 
+		Input::merge(array(
+			'home' => strtolower(trim(trim(str_replace('\\', '/', Input::get('home'))),	'/')),
+			'ip'   => implode("\r\n", array_unique(array_filter(array_map('trim', explode("\r\n",str_replace(' ', '', Input::get('ip'))))))),
+		));
+
+		$accountInstance = $account;
 		
+		$accountInstance->setValidationRules(array('username' => 'required|between:3,127|alpha_dash', 'password' => 'between:3,32|confirmed', 'password_confirmation' => 'between:3,32|same:password'));
+		
+		if ($accountInstance->validationFails())
+		{
+			// Ooops.. something went wrong
+			return Redirect::back()->withInput(Input::except('password', 'password_confirmation'))->withErrors($accountInstance->getValidator());
+		}
+		
+		// Saving Account
+		if ( ! $accountInstance->store())
+		{
+			return Redirect::route('accounts.index')->with('error', Lang::get('accounts/messages.error.update'));
+		}
+
+		// Attaching Related Model for IP
+		$accountInstance->storeIp();
+
+		// Attaching Related Model for User
+		$accountInstance->storeUser();
+
+		// Redirect to the user page
+		return Redirect::route('accounts.index', array('page' => input::get('indexPage', 1)))->with('success',
+			Lang::get('accounts/messages.success.update'));
 		
 	}
 

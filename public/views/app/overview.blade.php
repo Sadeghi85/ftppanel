@@ -26,7 +26,7 @@
 		Total Accounts: {{ Account::count() }}
 		<br>
 		Active Accounts: {{ Account::activated()->count() }}
-		<br>
+		<br><br>
 
 		Ftp Status:
 		<div class="ftp-status">

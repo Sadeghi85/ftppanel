@@ -105,9 +105,10 @@ class Account extends Eloquent {
 
 	public function store()
 	{
-		$inputs = Input::only('username', 'ulbandwidth', 'dlbandwidth', 'quotasize', 'quotafiles', 'comment');
+		$inputs = array_filter(Input::only('username', 'ulbandwidth', 'dlbandwidth', 'quotasize', 'quotafiles'));
 		$inputs['home'] = Config::get('ftppanel.ftpHome').'/'.Input::get('home');
 		$inputs['activated'] = (int) Input::get('activated', 0);
+		$inputs['comment'] = Input::get('comment', '');
 		
 		try
 		{
@@ -116,7 +117,12 @@ class Account extends Eloquent {
 				$this->$column = $value;
 			}
 
-			$this->password = sha1(Input::get('password'));
+			$password = Input::get('password', '');
+			
+			if ($password)
+			{
+				$this->password = sha1($password);
+			}
 
 			$this->save();
 		}
@@ -132,22 +138,22 @@ class Account extends Eloquent {
 	{
 		$users = Input::get('users', array());
 		
-		if (empty($users))
+		if ( ! empty($users))
 		{
-			$this->users()->attach(Sentry::getId());
+			$this->users()->sync($users);
 		}
 		
-		if (Sentry::getUser()->isSuperUser())
+		
+		if ( ! Sentry::getUser()->isSuperUser() && ! $this->users()->find(Sentry::getId()))
 		{
-			foreach ($users as $userId)
-			{
-				$this->users()->attach($userId);
-			}
+			$this->users()->attach(Sentry::getId());
 		}
 	}
 
 	public function storeIp()
 	{
+		$this->ip()->delete();
+		
 		$ipCollection = array_filter(explode("\r\n", Input::get('ip', '')));
 
 		if (empty($ipCollection))

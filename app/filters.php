@@ -86,7 +86,7 @@ Route::filter('auth.sentry.root', function()
 	}
 
 	// Check if the user is root
-	if ( ! Sentry::getUser()->inGroup(Sentry::findGroupByName('Root')))
+	if ( ! Sentry::getUser()->isSuperUser())
 	{
 		// Show the insufficient permissions page
 		App::abort(403);
@@ -121,6 +121,14 @@ Route::filter('guest', function()
 */
 
 Route::filter('csrf', function()
+{
+	if (Session::token() != Input::get('_token'))
+	{
+		throw new Illuminate\Session\TokenMismatchException;
+	}
+});
+
+Route::filter('csrf_strict', function()
 {
 	if (Session::token() != Input::get('_token'))
 	{

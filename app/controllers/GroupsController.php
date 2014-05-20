@@ -71,15 +71,15 @@ class GroupsController extends RootController {
 			if ($group = Sentry::getGroupProvider()->create($inputs))
 			{
 				// Log
-				PanelLog::success(
-					array(
-							'user_id'      => Sentry::getUser()->id,
-							'user_object'  => serialize(Sentry::getUser()),
-							'group_id'     => $group->id,
-							'group_object' => serialize($group),
-							'event'        => Config::get('panel_log.log_types.create_group'),
-							'description'  => '',
-				));
+				// PanelLog::success(
+					// array(
+							// 'user_id'      => Sentry::getUser()->id,
+							// 'user_object'  => serialize(Sentry::getUser()),
+							// 'group_id'     => $group->id,
+							// 'group_object' => serialize($group),
+							// 'event'        => Config::get('panel_log.log_types.create_group'),
+							// 'description'  => '',
+				// ));
 				
 				// Redirect to the group management page
 				return Redirect::route('groups.index')->with('success', Lang::get('groups/messages.success.create'));

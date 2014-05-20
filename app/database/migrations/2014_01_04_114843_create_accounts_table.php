@@ -22,7 +22,7 @@ class CreateAccountsTable extends Migration {
 			$table->string('username')->unique();
 			$table->string('password');
 			$table->string('home');
-			//$table->text('comment')->default(''); # MySQL 5.6: BLOB/TEXT column 'comment' can't have a default value
+			//$table->text('comment')->default(''); # MySQL strict mode: BLOB/TEXT column 'comment' can't have a default value
 			$table->text('comment');
 
 			$table->smallInteger('ulbandwidth')->unsigned()->default(0);

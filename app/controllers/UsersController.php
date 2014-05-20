@@ -110,14 +110,14 @@ class UsersController extends RootController {
 				}
 
 				// Log
-				PanelLog::success(
-					array(
+				// PanelLog::success(
+					// array(
 							
-							'user_id'     => Sentry::getUser()->id,
-							'user_name'   => Sentry::getUser()->username,
-							'event'       => 'create_user',
-							'description' => serialize($user->load('groups')),
-				));
+							// 'user_id'     => Sentry::getUser()->id,
+							// 'user_name'   => Sentry::getUser()->username,
+							// 'event'       => 'create_user',
+							// 'description' => serialize($user->load('groups')),
+				// ));
 
 				// Prepare the success message
 				$success = Lang::get('users/messages.success.create');
@@ -210,8 +210,6 @@ class UsersController extends RootController {
 	 */
 	public function update($user)
 	{
-		//$usernameToLog = $user->usernameWithFullName();
-		
 		// Validation
 		$user->setValidationRules(array(
 			'username' => 'required|between:3,127|alpha_dash|unique:users,username,'.$user->id,

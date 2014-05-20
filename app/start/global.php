@@ -176,6 +176,17 @@ Blade::extend(function($value)
 	return preg_replace('/@php((.|\s)*?)@endphp/', '<?php $1 ?>', $value);
 });
 
+Blade::extend(function($value)
+{
+	return preg_replace_callback('/@comment((.|\s)*?)@endcomment/',
+              function ($matches) {
+                    return '<?php /* ' . preg_replace('/@|\{/', '\\\\$0\\\\', $matches[1]) . ' */ ?>';
+              },
+              $value
+			);
+});
+
+
 /*
 |--------------------------
 | View Composers
