@@ -1,8 +1,8 @@
-#!/opt/webpanel/lamp/php/bin/php
+#!/usr/bin/php
 <?php
 
 $ftpHome = '/var/www/FtpPanel/cdn1';
-$cdnDomain = 'cdn1.iribtv.ir';
+$cdnDomain = 'cdn1.example.com';
 
 $dir = str_replace($ftpHome, '', $argv[1]);
 
