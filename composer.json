@@ -28,7 +28,7 @@
 			"php artisan --env=work debugbar:publish",
 			"php artisan clear-compiled",
 			"php artisan --env=work ide-helper:generate",
-			"php artisan optimize"
+			"php artisan --env=production optimize"
 		],
 		"post-create-project-cmd": [
 			"php artisan key:generate"
