@@ -2,7 +2,7 @@
 <?php
 
 $ftpHome = '/var/www/FtpPanel/cdn1';
-$cdnDomain = 'cdn1.example.com';
+$cdnDomain = 'cdn1.iribtv.ir';
 
 $dir = str_replace($ftpHome, '', $argv[1]);
 

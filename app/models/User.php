@@ -60,6 +60,11 @@ class User extends SentryUserModel {
         $this->validationRules = array_replace($this->validationRules, $newRules);
     }
 	
+	public function scopeActivated($query)
+	{
+		return $query->where('activated', '=', 1);
+	}
+	
 	/**
 	 * One to many relationship.
 	 *

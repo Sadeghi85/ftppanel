@@ -30,6 +30,20 @@
 	</h3>
 </div>
 
+<div class="row">
+	<div class="col-md-offset-28 col-md-16">
+		<ul class="nav nav-pills nav-stacked">
+			<li class="active">
+				<a href="#">
+				<span class="badge pull-right">{{ Group::count() }}</span>
+				Total
+				</a>
+			</li>
+		</ul>
+	</div>
+
+</div>
+
 {{ $groups->links() }}
 
 <div class="table-responsive clearfix">

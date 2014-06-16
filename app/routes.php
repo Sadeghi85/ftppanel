@@ -22,14 +22,16 @@ Route::get('/', function()
 
 // Route::get('ser', array('as' => 'ser', function()
 // {
-	// $a = unserialize(PanelLog::find(7)->description);
-	// return var_dump($a->groups->lists('name'));
+	//$a = unserialize(PanelLog::find(7)->description);
+	//return var_dump($a->groups->lists('name'));
+	
+	// return Hash::make('cdn1##adminpanel');
 // }));
 
-Route::get('keepalive', array('as' => 'keepalive', function()
-{
-	return;
-}));
+// Route::get('keepalive', array('as' => 'keepalive', function()
+// {
+	// return;
+// }));
 
 Route::group(array('before' => 'auth.sentry.root'), function()
 {

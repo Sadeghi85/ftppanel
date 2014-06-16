@@ -35,6 +35,31 @@
 	</h3>
 </div>
 
+<div class="row">
+	<div class="col-md-offset-21 col-md-15">
+		<ul class="nav nav-pills nav-stacked">
+			<li class="active">
+				<a href="#">
+				<span class="badge pull-right">{{ Account::count() }}</span>
+				Total
+				</a>
+			</li>
+		</ul>
+	</div>
+	
+	<div class="col-md-15">
+		<ul class="nav nav-pills nav-stacked">
+			<li class="active">
+			<a href="#">
+			<span class="badge pull-right">{{ Account::activated()->count() }}</span>
+			Active
+			</a>
+			</li>
+		</ul>
+	</div>
+</div>
+
+
 {{ $accounts->links() }}
 
 <div class="table-responsive clearfix">
