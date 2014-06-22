@@ -27,7 +27,7 @@ class Account extends Eloquent {
 		'ip'           => 'custom.ip_range',
 		'ulbandwidth'  => 'integer',
 		'dlbandwidth'  => 'integer',
-		'quotasize'    => 'integer',
+		'quotasize'    => 'required|integer',
 		'quotafiles'   => 'integer',
     );
 	

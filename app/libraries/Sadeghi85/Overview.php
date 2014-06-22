@@ -1,5 +1,6 @@
 <?php namespace Libraries\Sadeghi85;
 
+use \Illuminate\Support\Facades\DB as DB;
 // use AdminController;
 // use View;
 
@@ -77,6 +78,14 @@ class Overview {
 		$usedSpace = sprintf('%01.2f', ($usedSpace / (1024 * 1024)));
 
 		return $usedSpace;
+	}
+	
+	public static function getPanelAssignedSpace()
+	{
+		// Prevent SQL injection - variable binding
+		$sum = DB::select(DB::raw("SELECT SUM(quotasize) sum FROM (SELECT * FROM (SELECT * FROM accounts WHERE activated = 1 ORDER BY quotasize DESC) a GROUP BY a.home) b"), array());
+
+		return sprintf('%01.2f', ($sum[0]->sum / 1024));
 	}
 	
 	public static function getTotalMemory()
