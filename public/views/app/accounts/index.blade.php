@@ -69,6 +69,7 @@
 		<tr>
 			<th style="width: 50px;text-align: center;">@lang('accounts/messages.index.id')</th>
 			<th style="width: 80px;text-align: center;">@lang('accounts/messages.index.activated')</th>
+			<th style="width: 120px;text-align: center;">@lang('accounts/messages.index.readonly')</th>
 			<th style="width: 300px;">@lang('accounts/messages.index.username')</th>
 			<th >@lang('accounts/messages.index.home')</th>
 
@@ -81,6 +82,9 @@
 				<tr>
 					<td style="text-align: center;">{{ $account->id }}</td>
 					<td style="text-align: center;"><span class="glyphicon glyphicon-{{ ($account->activated ? 'ok'
+					 : 'remove')
+					}}"></span></td>
+					<td style="text-align: center;"><span class="glyphicon glyphicon-{{ ($account->readonly ? 'ok'
 					 : 'remove')
 					}}"></span></td>
 					<td>{{ $account->username }}</td>

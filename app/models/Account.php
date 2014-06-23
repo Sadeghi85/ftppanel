@@ -107,6 +107,7 @@ class Account extends Eloquent {
 	{
 		$inputs = array_filter(Input::only('username', 'ulbandwidth', 'dlbandwidth', 'quotasize', 'quotafiles'));
 		$inputs['home'] = Config::get('ftppanel.ftpHome').'/'.Input::get('home');
+		$inputs['readonly'] = (int) Input::get('readonly', 1);
 		$inputs['activated'] = (int) Input::get('activated', 0);
 		$inputs['comment'] = Input::get('comment', '');
 		
@@ -129,6 +130,15 @@ class Account extends Eloquent {
 		catch (\Exception $e)
 		{
 			return false;
+		}
+		
+		if ($inputs['readonly'])
+		{
+			Event::fire('account.readonly_upload', array($inputs['home']));
+		}
+		else
+		{
+			Event::fire('account.normal_upload', array($inputs['home']));
 		}
 		
 		return true;

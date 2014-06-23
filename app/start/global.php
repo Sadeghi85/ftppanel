@@ -186,6 +186,21 @@ Blade::extend(function($value)
 			);
 });
 
+/*
+|--------------------------
+| Events
+|--------------------------
+*/
+
+Event::listen('account.readonly_upload', function($dir)
+{
+    Libraries\Sadeghi85\UploadScript::setReadonly($dir);
+});
+
+Event::listen('account.normal_upload', function($dir)
+{
+    Libraries\Sadeghi85\UploadScript::unsetReadonly($dir);
+});
 
 /*
 |--------------------------

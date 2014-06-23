@@ -44,6 +44,12 @@
 				<td>{{ $account->id }}</td>
 			</tr>
 			<tr>
+				<td>@lang('accounts/messages.show.readonly')</td>
+				<td><span class="glyphicon glyphicon-{{ ($account->readonly ? 'ok'
+					 : 'remove')
+					}}"></span></td>
+			</tr>
+			<tr>
 				<td>@lang('accounts/messages.show.activated')</td>
 				<td><span class="glyphicon glyphicon-{{ ($account->activated ? 'ok'
 					 : 'remove')

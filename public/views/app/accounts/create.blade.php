@@ -198,6 +198,21 @@
 					</div>
 				</div>
 
+				<!-- Read-only Upload -->
+				<div class="form-group {{ $errors->has('readonly') ? 'has-error' : '' }}">
+					{{ Form::label('readonly', Lang::get('accounts/messages.create.readonly'),
+					array('class' => 'control-label col-md-12')) }}
+					<div class="col-md-12">
+						{{ Form::select('readonly', array('0'=>Lang::get('general.no'),'1'=>Lang::get('general.yes')), Input::old('readonly', 1), array('class'=>'form-control')) }}
+					</div>
+					<div class="col-md-6">
+						<label class="control-label"></label>
+					</div>
+					<div class="col-md-24">
+						<span class="help-block">{{ $errors->first('readonly') }}</span>
+					</div>
+				</div>
+				
 				<!-- Activation Status -->
 				<div class="form-group {{ $errors->has('activated') ? 'has-error' : '' }}">
 					{{ Form::label('activated', Lang::get('accounts/messages.create.activated'),

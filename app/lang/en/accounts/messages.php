@@ -27,6 +27,7 @@ return array(
 		'create' => 'Create',
 		
 		'id' => 'Id',
+		'readonly' => 'Read-only Upload',
 		'activated' => 'Activated',
 		'username' => 'Username',
 		'home' => 'Home',
@@ -46,6 +47,7 @@ return array(
 		'value' => 'Value',
 
 		'id' => 'Id',
+		'readonly' => 'Read-only Upload',
 		'activated' => 'Activated',
 		'username' => 'Username',
 		'home' => 'Home',
@@ -78,6 +80,7 @@ return array(
 		'dlbandwidth' => 'Download Bandwidth',
 		'quotasize' => 'Quota Size',
 		'quotafiles' => 'Quota Files',
+		'readonly' => 'Read-only Upload',
 		'activated' => 'Activate',
 		'users' => 'Users',
 		
@@ -100,6 +103,7 @@ return array(
 		'dlbandwidth' => 'Download Bandwidth',
 		'quotasize' => 'Quota Size',
 		'quotafiles' => 'Quota Files',
+		'readonly' => 'Read-only Upload',
 		'activated' => 'Activate',
 		'users' => 'Users',
 		
