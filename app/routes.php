@@ -25,8 +25,34 @@ Route::get('/', function()
 	//$a = unserialize(PanelLog::find(7)->description);
 	//return var_dump($a->groups->lists('name'));
 	
-	// return Hash::make('cdn1##adminpanel');
+	// return Hash::make('123456');
 // }));
+
+Route::get('/uploadscript', function()
+{
+	$file = Input::get('file', '');
+	
+	if ($file and stripos(Request::header('User-Agent'), 'libcurl') !== false)
+	{
+		$ftpHome = Config::get('ftppanel.ftpHome');
+		$cdnDomain = 'cdn1.iribtv.ir';
+		$file = rtrim(urldecode($file), '/');
+		$relativeFile = str_replace($ftpHome, '', $file);
+		$topDir = explode('/', trim($relativeFile, '/'));
+		$topDir = $ftpHome.'/'.$topDir[0];
+		
+		shell_exec(sprintf('echo "%s" | sudo tee %s', 'http://'.$cdnDomain.'/'.encodeURI($relativeFile), $file.'.txt'));
+		
+		$sharedHome = Account::where('home', 'LIKE', $topDir.'%')->where('readonly', '=', 1)->lists('username');
+		
+		if ( ! empty($sharedHome))
+		{
+			Event::fire('account.readonly_upload', array($topDir));
+		}
+	}
+	
+	return;
+})->where('file', '.*');
 
 Route::get('keepalive', array('as' => 'keepalive', function()
 {

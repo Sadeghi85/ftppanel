@@ -107,6 +107,19 @@
 						<span class="help-block">{{ $errors->first('home') }}</span>
 					</div>
 				</div>
+				
+				@if ( ! empty($sharedHome))
+				<div class="form-group">
+					{{ Form::label('', '|__ Also shared with',array('class' => 'control-label col-md-24')) }}
+					<div class="col-md-12">
+						<select name="others" id="others" class="form-control">
+							@foreach ($sharedHome as $sharedUser)
+							<option value="">{{ $sharedUser }}</option>
+							@endforeach
+						</select>
+					</div>
+				</div>
+				@endif
 
 				<!-- IP -->
 				<div class="form-group {{ $errors->has('ip') ? 'has-error' : '' }}">
@@ -156,7 +169,7 @@
 
 				<!-- Quota Size -->
 				<div class="form-group {{ $errors->has('quotasize') ? 'has-error' : '' }}">
-					{{ Form::label('quotasize', Lang::get('accounts/messages.edit.quotasize'),
+					{{ Form::label('quotasize', Lang::get('accounts/messages.edit.quotasize').' *',
 					array('class' => 'control-label col-md-12')) }}
 					<div class="col-md-12">
 						{{ Form::text('quotasize', Input::old('quotasize', ($account->quotasize ?: '' )), array('class'=>'form-control', 'placeholder' => Lang::get('general.unlimited'))) }}

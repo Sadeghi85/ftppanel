@@ -155,7 +155,7 @@
 
 				<!-- Quota Size -->
 				<div class="form-group {{ $errors->has('quotasize') ? 'has-error' : '' }}">
-					{{ Form::label('quotasize', Lang::get('accounts/messages.create.quotasize'),
+					{{ Form::label('quotasize', Lang::get('accounts/messages.create.quotasize').' *',
 					array('class' => 'control-label col-md-12')) }}
 					<div class="col-md-12">
 						{{ Form::text('quotasize', Input::old('quotasize'), array('class'=>'form-control', 'placeholder' => Lang::get('general.unlimited'))) }}

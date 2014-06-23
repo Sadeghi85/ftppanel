@@ -132,13 +132,23 @@ class Account extends Eloquent {
 			return false;
 		}
 		
+		$ftpHome = Config::get('ftppanel.ftpHome');
+		$topDir = explode('/', trim(str_replace($ftpHome, '', $inputs['home']), '/'));
+		$topDir = $ftpHome.'/'.$topDir[0];
+			
 		if ($inputs['readonly'])
 		{
-			Event::fire('account.readonly_upload', array($inputs['home']));
+			Event::fire('account.readonly_upload', array($topDir));
 		}
 		else
 		{
-			Event::fire('account.normal_upload', array($inputs['home']));
+			
+			$sharedHome = Account::where('home', 'LIKE', $topDir.'%')->where('readonly', '=', 1)->lists('username');
+
+			if (empty($sharedHome))
+			{
+				Event::fire('account.normal_upload', array($topDir));
+			}
 		}
 		
 		return true;

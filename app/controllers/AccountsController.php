@@ -159,9 +159,15 @@ class AccountsController extends AuthorizedController {
 		{
 			$indexPage = $matches[1];
 		}
+		
+		$ftpHome = Config::get('ftppanel.ftpHome');
+		$topDir = explode('/', trim(str_replace($ftpHome, '', $account->home), '/'));
+		$topDir = $ftpHome.'/'.$topDir[0];
+		$sharedHome = Account::where('home', 'LIKE', $topDir.'%')->lists('username');
+		$sharedHome = array_diff($sharedHome, array($account->username));
 
 		// Show the page
-		return View::make('app.accounts.edit', compact('account', 'allUsers', 'selectedUsers', 'indexPage'));
+		return View::make('app.accounts.edit', compact('account', 'allUsers', 'selectedUsers', 'indexPage', 'sharedHome'));
 	}
 
 	/**
