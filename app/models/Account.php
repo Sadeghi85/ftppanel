@@ -24,6 +24,7 @@ class Account extends Eloquent {
 		'password_confirmation'  => 'required|between:3,32|same:password',
 
 		'home'         => array('required', 'between:1,127', 'regex:/^[\/a-zA-z0-9_-]+$/'),
+		'aliases'           => 'custom.domain',
 		'ip'           => 'custom.ip_range',
 		'ulbandwidth'  => 'integer',
 		'dlbandwidth'  => 'integer',
@@ -96,6 +97,11 @@ class Account extends Eloquent {
 	public function ip()
     {
         return $this->hasMany('Ip', 'account_id');
+    }
+	
+	public function aliases()
+    {
+        return $this->hasMany('Alias', 'account_id');
     }
 
 	public function scopeActivated($query)
@@ -170,6 +176,31 @@ class Account extends Eloquent {
 		}
 	}
 
+	public function storeAliases()
+	{
+		$this->aliases()->delete();
+		
+		$aliasCollection = array_filter(explode("\r\n", Input::get('aliases', '')));
+
+		if (empty($aliasCollection))
+		{
+			$alias = new Alias();
+
+			$this->aliases()->save($alias);
+		}
+		else
+		{
+			foreach($aliasCollection as $_alias)
+			{
+				$alias = new Alias(array(
+					'domain' => $_alias,
+				));
+
+				$this->aliases()->save($alias);
+			}
+		}
+	}
+	
 	public function storeIp()
 	{
 		$this->ip()->delete();

@@ -35,15 +35,31 @@ Route::get('/uploadscript', function()
 	if ($file and stripos(Request::header('User-Agent'), 'libcurl') !== false)
 	{
 		$ftpHome = Config::get('ftppanel.ftpHome');
-		$cdnDomain = 'cdn1.iribtv.ir';
+		//$cdnDomain = Config::get('ftppanel.ftpDefaultDomain');
 		$file = rtrim(urldecode($file), '/');
 		$relativeFile = str_replace($ftpHome, '', $file);
 		$topDir = explode('/', trim($relativeFile, '/'));
 		$topDir = $ftpHome.'/'.$topDir[0];
+		$aliases = array();
+		$txtContent = '';
 		
-		shell_exec(sprintf('echo "%s" | sudo tee %s', 'http://'.$cdnDomain.'/'.encodeURI($relativeFile), $file.'.txt'));
+		$accountsWithSameTopLevelDir = Account::where('home', 'LIKE', $topDir.'%');
 		
-		$sharedHome = Account::where('home', 'LIKE', $topDir.'%')->where('readonly', '=', 1)->lists('username');
+		$accountsWithSameTopLevelDir->get()->each(function($account) use (&$aliases)
+		{
+			$aliases = array_merge($aliases, $account->aliases()->lists('domain'));
+		});
+		
+		$aliases = array_unique($aliases);
+		
+		foreach ($aliases as $alias)
+		{
+			$txtContent .= 'http://'.$alias.'/'.encodeURI($relativeFile)."\r\n";
+		}
+		
+		shell_exec(sprintf('echo "%s" | sudo tee %s', $txtContent, $file.'.txt'));
+		
+		$sharedHome = $accountsWithSameTopLevelDir->where('readonly', '=', 1)->lists('username');
 		
 		if ( ! empty($sharedHome))
 		{

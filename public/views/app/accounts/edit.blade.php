@@ -120,6 +120,22 @@
 					</div>
 				</div>
 				@endif
+				
+				<!-- Aliases -->
+				<div class="form-group {{ $errors->has('aliases') ? 'has-error' : '' }}">
+					{{ Form::label('aliases', Lang::get('accounts/messages.edit.aliases'),
+					array('class' => 'control-label col-md-12')) }}
+					<div class="col-md-24">
+						{{ Form::textarea('aliases', Input::old('aliases', Alias::formatForHumans($account->aliases)), array('class'=>'form-control',
+						'placeholder'=>Config::get('ftppanel.ftpDefaultDomain'))) }}
+					</div>
+					<div class="col-md-6">
+						<label class="control-label"></label>
+					</div>
+					<div class="col-md-24">
+						<span class="help-block">{{ $errors->first('aliases') }}</span>
+					</div>
+				</div>
 
 				<!-- IP -->
 				<div class="form-group {{ $errors->has('ip') ? 'has-error' : '' }}">
@@ -172,7 +188,7 @@
 					{{ Form::label('quotasize', Lang::get('accounts/messages.edit.quotasize').' *',
 					array('class' => 'control-label col-md-12')) }}
 					<div class="col-md-12">
-						{{ Form::text('quotasize', Input::old('quotasize', ($account->quotasize ?: '' )), array('class'=>'form-control', 'placeholder' => Lang::get('general.unlimited'))) }}
+						{{ Form::text('quotasize', Input::old('quotasize', ($account->quotasize ?: '' )), array('class'=>'form-control')) }}
 					</div>
 					<div class="col-md-6">
 						<label class="control-label">MB</label>
