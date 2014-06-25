@@ -138,9 +138,8 @@ class Account extends Eloquent {
 			return false;
 		}
 		
-		$ftpHome = Config::get('ftppanel.ftpHome');
-		$topDir = explode('/', trim(str_replace($ftpHome, '', $inputs['home']), '/'));
-		$topDir = $ftpHome.'/'.$topDir[0];
+
+		$topDir = Libraries\Sadeghi85\UploadScript::getTopDir($inputs['home'])['topDir'];
 			
 		if ($inputs['readonly'])
 		{

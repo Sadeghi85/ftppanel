@@ -34,12 +34,11 @@ Route::get('/uploadscript', function()
 	
 	if ($file and stripos(Request::header('User-Agent'), 'libcurl') !== false)
 	{
-		$ftpHome = Config::get('ftppanel.ftpHome');
-		//$cdnDomain = Config::get('ftppanel.ftpDefaultDomain');
 		$file = rtrim(urldecode($file), '/');
-		$relativeFile = str_replace($ftpHome, '', $file);
-		$topDir = explode('/', trim($relativeFile, '/'));
-		$topDir = $ftpHome.'/'.$topDir[0];
+		
+		$topDir = Libraries\Sadeghi85\UploadScript::getTopDir($file)['topDir'];
+		$relativeFile = Libraries\Sadeghi85\UploadScript::getTopDir($file)['relativeFile'];
+
 		$aliases = array();
 		$txtContent = '';
 		
@@ -57,7 +56,7 @@ Route::get('/uploadscript', function()
 			$txtContent .= 'http://'.$alias.'/'.encodeURI($relativeFile)."\r\n";
 		}
 		
-		shell_exec(sprintf('echo "%s" | sudo tee %s', $txtContent, $file.'.txt'));
+		shell_exec(sprintf('echo "%s" | sudo tee "%s"', $txtContent, $file.'.txt'));
 		
 		$sharedHome = $accountsWithSameTopLevelDir->where('readonly', '=', 1)->lists('username');
 		
@@ -68,7 +67,7 @@ Route::get('/uploadscript', function()
 	}
 	
 	return;
-})->where('file', '.*');
+});
 
 Route::get('keepalive', array('as' => 'keepalive', function()
 {
