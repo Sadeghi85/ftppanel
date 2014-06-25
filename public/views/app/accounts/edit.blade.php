@@ -108,6 +108,35 @@
 					</div>
 				</div>
 
+				@if ( ! empty($sharedHome))
+				<div class="form-group">
+					{{ Form::label('', '|__ Also shared with',array('class' => 'control-label col-md-24')) }}
+					<div class="col-md-12">
+						<select name="others" id="others" class="form-control">
+							@foreach ($sharedHome as $sharedUser)
+							<option value="">{{ $sharedUser }}</option>
+							@endforeach
+						</select>
+					</div>
+				</div>
+				@endif
+				
+				<!-- Aliases -->
+				<div class="form-group {{ $errors->has('aliases') ? 'has-error' : '' }}">
+					{{ Form::label('aliases', Lang::get('accounts/messages.edit.aliases'),
+					array('class' => 'control-label col-md-12')) }}
+					<div class="col-md-24">
+						{{ Form::textarea('aliases', Input::old('aliases', Alias::formatForHumans($account->aliases)), array('class'=>'form-control',
+						'placeholder'=>Config::get('ftppanel.ftpDefaultDomain'))) }}
+					</div>
+					<div class="col-md-6">
+						<label class="control-label"></label>
+					</div>
+					<div class="col-md-24">
+						<span class="help-block">{{ $errors->first('aliases') }}</span>
+					</div>
+				</div>
+
 				<!-- IP -->
 				<div class="form-group {{ $errors->has('ip') ? 'has-error' : '' }}">
 					{{ Form::label('ip', Lang::get('accounts/messages.edit.ip'),
@@ -156,10 +185,10 @@
 
 				<!-- Quota Size -->
 				<div class="form-group {{ $errors->has('quotasize') ? 'has-error' : '' }}">
-					{{ Form::label('quotasize', Lang::get('accounts/messages.edit.quotasize'),
+					{{ Form::label('quotasize', Lang::get('accounts/messages.edit.quotasize').' *',
 					array('class' => 'control-label col-md-12')) }}
 					<div class="col-md-12">
-						{{ Form::text('quotasize', Input::old('quotasize', ($account->quotasize ?: '' )), array('class'=>'form-control', 'placeholder' => Lang::get('general.unlimited'))) }}
+						{{ Form::text('quotasize', Input::old('quotasize', ($account->quotasize ?: '' )), array('class'=>'form-control')) }}
 					</div>
 					<div class="col-md-6">
 						<label class="control-label">MB</label>
@@ -196,6 +225,21 @@
 					</div>
 					<div class="col-md-24">
 						<span class="help-block">{{ $errors->first('comment') }}</span>
+					</div>
+				</div>
+
+				<!-- Read-only Upload -->
+				<div class="form-group {{ $errors->has('readonly') ? 'has-error' : '' }}">
+					{{ Form::label('readonly', Lang::get('accounts/messages.edit.readonly'),
+					array('class' => 'control-label col-md-12')) }}
+					<div class="col-md-12">
+						{{ Form::select('readonly', array('0'=>Lang::get('general.no'),'1'=>Lang::get('general.yes')), Input::old('readonly', $account->readonly), array('class'=>'form-control')) }}
+					</div>
+					<div class="col-md-6">
+						<label class="control-label"></label>
+					</div>
+					<div class="col-md-24">
+						<span class="help-block">{{ $errors->first('readonly') }}</span>
 					</div>
 				</div>
 

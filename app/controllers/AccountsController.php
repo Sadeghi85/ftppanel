@@ -97,6 +97,7 @@ class AccountsController extends AuthorizedController {
 		Input::merge(array(
 			'home' => strtolower(trim(trim(str_replace('\\', '/', Input::get('home'))),	'/')),
 			'ip'   => implode("\r\n", array_unique(array_filter(array_map('trim', explode("\r\n",str_replace(' ', '', Input::get('ip'))))))),
+			'aliases' => implode("\r\n", array_unique(array_filter(array_map('trim', explode("\r\n",preg_replace('#(?:^|\r\n)([^/]*)/.*#', '$1', str_replace(array(' ', 'http://', 'https://'), '', strtolower(Input::get('aliases'))))))))),
 		));
 
 		$accountInstance = new Account;
@@ -112,6 +113,9 @@ class AccountsController extends AuthorizedController {
 		{
 			return Redirect::route('accounts.index')->with('error', Lang::get('accounts/messages.error.create'));
 		}
+
+		// Attaching Related Model for Aliases
+		$accountInstance->storeAliases();
 
 		// Attaching Related Model for IP
 		$accountInstance->storeIp();
@@ -160,8 +164,12 @@ class AccountsController extends AuthorizedController {
 			$indexPage = $matches[1];
 		}
 
+		$topDir = Libraries\Sadeghi85\UploadScript::getTopDir($account->home)['topDir'];
+		$sharedHome = Account::where('home', 'LIKE', $topDir.'%')->lists('username');
+		$sharedHome = array_diff($sharedHome, array($account->username));
+
 		// Show the page
-		return View::make('app.accounts.edit', compact('account', 'allUsers', 'selectedUsers', 'indexPage'));
+		return View::make('app.accounts.edit', compact('account', 'allUsers', 'selectedUsers', 'indexPage', 'sharedHome'));
 	}
 
 	/**
@@ -180,6 +188,7 @@ class AccountsController extends AuthorizedController {
 		Input::merge(array(
 			'home' => strtolower(trim(trim(str_replace('\\', '/', Input::get('home'))),	'/')),
 			'ip'   => implode("\r\n", array_unique(array_filter(array_map('trim', explode("\r\n",str_replace(' ', '', Input::get('ip'))))))),
+			'aliases' => implode("\r\n", array_unique(array_filter(array_map('trim', explode("\r\n",preg_replace('#(?:^|\r\n)([^/]*)/.*#', '$1', str_replace(array(' ', 'http://', 'https://'), '', strtolower(Input::get('aliases'))))))))),
 		));
 
 		$accountInstance = $account;
@@ -197,6 +206,9 @@ class AccountsController extends AuthorizedController {
 		{
 			return Redirect::route('accounts.index')->with('error', Lang::get('accounts/messages.error.update'));
 		}
+
+		// Attaching Related Model for Aliases
+		$accountInstance->storeAliases();
 
 		// Attaching Related Model for IP
 		$accountInstance->storeIp();

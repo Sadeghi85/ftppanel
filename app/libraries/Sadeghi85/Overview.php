@@ -1,6 +1,7 @@
 <?php namespace Libraries\Sadeghi85;
 
 use \Illuminate\Support\Facades\DB as DB;
+use \Illuminate\Support\Facades\Config as Config;
 // use AdminController;
 // use View;
 
@@ -79,7 +80,19 @@ class Overview {
 
 		return $usedSpace;
 	}
-	
+
+	public static function getPanelTotalSpace()
+	{
+		self::_diskInfo();
+
+		$totalSpace = preg_replace('#.*?total\s*(\d+).*#is', '$1', self::$_diskInfo);
+		
+		$cdnSpace = shell_exec('sudo du -ck --max-depth=1 ' . Config::get('ftppanel.ftpHome'));
+		$cdnSpace = preg_replace('#.*?(\d+)\s*total.*#is', '$1', $cdnSpace);
+		
+		return sprintf('%01.2f', (($totalSpace - $cdnSpace) / (1024 * 1024)));
+	}
+
 	public static function getPanelAssignedSpace()
 	{
 		// Prevent SQL injection - variable binding
@@ -103,16 +116,16 @@ class Overview {
 		self::_memInfo();
 
 		$totalMem = preg_replace('#.*?MemTotal:\s*(\d+).*#is', '$1', self::$_memInfo);
-		$totalMem = sprintf('%01.2f', ($totalMem / 1024));
+		//$totalMem = sprintf('%01.2f', ($totalMem / 1024));
 		
 		$freeMem = preg_replace('#.*?MemFree:\s*(\d+).*#is', '$1', self::$_memInfo);
-		$freeMem = sprintf('%01.2f', ($freeMem / 1024));
+		//$freeMem = sprintf('%01.2f', ($freeMem / 1024));
 		
 		$cachedMem = preg_replace('#.*?Cached:\s*(\d+).*#is', '$1', self::$_memInfo);
-		$cachedMem = sprintf('%01.2f', ($cachedMem / 1024));
+		//$cachedMem = sprintf('%01.2f', ($cachedMem / 1024));
 		
 		
-		return ($totalMem - $freeMem - $cachedMem);
+		return sprintf('%01.2f', ($totalMem - $freeMem - $cachedMem) / 1024);
 	}
 	
 	public static function getTotalSwap()
@@ -130,13 +143,12 @@ class Overview {
 		self::_memInfo();
 
 		$totalMem = preg_replace('#.*?SwapTotal:\s*(\d+).*#is', '$1', self::$_memInfo);
-		$totalMem = sprintf('%01.2f', ($totalMem / 1024));
+		//$totalMem = sprintf('%01.2f', ($totalMem / 1024));
 		
 		$freeMem = preg_replace('#.*?SwapFree:\s*(\d+).*#is', '$1', self::$_memInfo);
-		$freeMem = sprintf('%01.2f', ($freeMem / 1024));
+		//$freeMem = sprintf('%01.2f', ($freeMem / 1024));
 		
-		
-		return ($totalMem - $freeMem);
+		return sprintf('%01.2f', ($totalMem - $freeMem) / 1024);
 	}
 
 }

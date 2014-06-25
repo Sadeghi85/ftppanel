@@ -107,6 +107,22 @@
 					</div>
 				</div>
 
+				<!-- Aliases -->
+				<div class="form-group {{ $errors->has('aliases') ? 'has-error' : '' }}">
+					{{ Form::label('aliases', Lang::get('accounts/messages.create.aliases'),
+					array('class' => 'control-label col-md-12')) }}
+					<div class="col-md-24">
+						{{ Form::textarea('aliases', Input::old('aliases'), array('class'=>'form-control',
+						'placeholder'=>Config::get('ftppanel.ftpDefaultDomain'))) }}
+					</div>
+					<div class="col-md-6">
+						<label class="control-label"></label>
+					</div>
+					<div class="col-md-24">
+						<span class="help-block">{{ $errors->first('aliases') }}</span>
+					</div>
+				</div>
+
 				<!-- IP -->
 				<div class="form-group {{ $errors->has('ip') ? 'has-error' : '' }}">
 					{{ Form::label('ip', Lang::get('accounts/messages.create.ip'),
@@ -155,10 +171,10 @@
 
 				<!-- Quota Size -->
 				<div class="form-group {{ $errors->has('quotasize') ? 'has-error' : '' }}">
-					{{ Form::label('quotasize', Lang::get('accounts/messages.create.quotasize'),
+					{{ Form::label('quotasize', Lang::get('accounts/messages.create.quotasize').' *',
 					array('class' => 'control-label col-md-12')) }}
 					<div class="col-md-12">
-						{{ Form::text('quotasize', Input::old('quotasize'), array('class'=>'form-control', 'placeholder' => Lang::get('general.unlimited'))) }}
+						{{ Form::text('quotasize', Input::old('quotasize'), array('class'=>'form-control')) }}
 					</div>
 					<div class="col-md-6">
 						<label class="control-label">MB</label>
@@ -195,6 +211,21 @@
 					</div>
 					<div class="col-md-24">
 						<span class="help-block">{{ $errors->first('comment') }}</span>
+					</div>
+				</div>
+
+				<!-- Read-only Upload -->
+				<div class="form-group {{ $errors->has('readonly') ? 'has-error' : '' }}">
+					{{ Form::label('readonly', Lang::get('accounts/messages.create.readonly'),
+					array('class' => 'control-label col-md-12')) }}
+					<div class="col-md-12">
+						{{ Form::select('readonly', array('0'=>Lang::get('general.no'),'1'=>Lang::get('general.yes')), Input::old('readonly', 1), array('class'=>'form-control')) }}
+					</div>
+					<div class="col-md-6">
+						<label class="control-label"></label>
+					</div>
+					<div class="col-md-24">
+						<span class="help-block">{{ $errors->first('readonly') }}</span>
 					</div>
 				</div>
 

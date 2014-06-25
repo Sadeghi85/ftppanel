@@ -25,8 +25,49 @@ Route::get('/', function()
 	//$a = unserialize(PanelLog::find(7)->description);
 	//return var_dump($a->groups->lists('name'));
 	
-	// return Hash::make('cdn1##adminpanel');
+	// return Hash::make('123456');
 // }));
+
+Route::get('/uploadscript', function()
+{
+	$file = Input::get('file', '');
+	
+	if ($file and stripos(Request::header('User-Agent'), 'libcurl') !== false)
+	{
+		$file = rtrim(urldecode($file), '/');
+		
+		$topDir = Libraries\Sadeghi85\UploadScript::getTopDir($file)['topDir'];
+		$relativeFile = Libraries\Sadeghi85\UploadScript::getTopDir($file)['relativeFile'];
+
+		$aliases = array();
+		$txtContent = '';
+		
+		$accountsWithSameTopLevelDir = Account::where('home', 'LIKE', $topDir.'%');
+		
+		$accountsWithSameTopLevelDir->get()->each(function($account) use (&$aliases)
+		{
+			$aliases = array_merge($aliases, $account->aliases()->lists('domain'));
+		});
+		
+		$aliases = array_unique($aliases);
+		
+		foreach ($aliases as $alias)
+		{
+			$txtContent .= 'http://'.$alias.'/'.encodeURI($relativeFile)."\r\n";
+		}
+		
+		shell_exec(sprintf('echo "%s" | sudo tee "%s"', $txtContent, $file.'.txt'));
+		
+		$sharedHome = $accountsWithSameTopLevelDir->where('readonly', '=', 1)->lists('username');
+		
+		if ( ! empty($sharedHome))
+		{
+			Event::fire('account.readonly_upload', array($topDir));
+		}
+	}
+	
+	return;
+});
 
 Route::get('keepalive', array('as' => 'keepalive', function()
 {

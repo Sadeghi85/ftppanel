@@ -164,6 +164,26 @@ Validator::extend('custom.ip_range', function($attribute, $value, $parameters)
 	return true;
 });
 
+Validator::extend('custom.domain', function($attribute, $value, $parameters)
+{
+	$inputs = explode("\r\n", trim($value));
+
+	foreach ($inputs as $input)
+	{
+		if (preg_match('#^\d+(?:\.\d+)*$#', $input))
+		{
+			return false;
+		}
+
+		if ( ! preg_match('#^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|\b-){0,61}[0-9A-Za-z])?(?:\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|\b-){0,61}[0-9A-Za-z])?)*$#', $input))
+		{
+			return false;
+		}
+	}
+
+	return true;
+});
+
 /*
 |--------------------------------------------------------------------------
 | Blade Extends
@@ -186,6 +206,46 @@ Blade::extend(function($value)
 			);
 });
 
+/*
+|--------------------------
+| Events
+|--------------------------
+*/
+
+Event::listen('account.readonly_upload', function($dir)
+{
+    Libraries\Sadeghi85\UploadScript::setReadonly($dir);
+});
+
+Event::listen('account.normal_upload', function($dir)
+{
+    Libraries\Sadeghi85\UploadScript::unsetReadonly($dir);
+});
+
+/*
+|--------------------------
+| Helpers
+|--------------------------
+*/
+
+function encodeURI($url)
+{
+    // http://php.net/manual/en/function.rawurlencode.php
+    // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/encodeURI
+    $unescaped = array(
+        '%2D'=>'-','%5F'=>'_','%2E'=>'.','%21'=>'!', '%7E'=>'~',
+        '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')'
+    );
+    $reserved = array(
+        '%3B'=>';','%2C'=>',','%2F'=>'/','%3F'=>'?','%3A'=>':',
+        '%40'=>'@','%26'=>'&','%3D'=>'=','%2B'=>'+','%24'=>'$'
+    );
+    $score = array(
+        '%23'=>'#'
+    );
+    return strtr(rawurlencode($url), array_merge($reserved,$unescaped,$score));
+
+}
 
 /*
 |--------------------------
