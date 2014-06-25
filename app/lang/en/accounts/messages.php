@@ -29,6 +29,7 @@ return array(
 		'id' => 'Id',
 		'readonly' => 'Read-only Upload',
 		'activated' => 'Activated',
+		'quotasize' => 'Quota Size (MB)',
 		'username' => 'Username',
 		'home' => 'Home',
 

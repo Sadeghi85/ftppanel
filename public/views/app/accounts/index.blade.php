@@ -70,7 +70,8 @@
 			<th style="width: 50px;text-align: center;">@lang('accounts/messages.index.id')</th>
 			<th style="width: 80px;text-align: center;">@lang('accounts/messages.index.activated')</th>
 			<th style="width: 120px;text-align: center;">@lang('accounts/messages.index.readonly')</th>
-			<th style="width: 300px;">@lang('accounts/messages.index.username')</th>
+			<th style="width: 80px;">@lang('accounts/messages.index.quotasize')</th>
+			<th style="width: 200px;">@lang('accounts/messages.index.username')</th>
 			<th >@lang('accounts/messages.index.home')</th>
 
 			<th style="width: 150px;">@lang('accounts/messages.index.actions')</th>
@@ -87,6 +88,7 @@
 					<td style="text-align: center;"><span class="glyphicon glyphicon-{{ ($account->readonly ? 'ok'
 					 : 'remove')
 					}}"></span></td>
+					<td>{{ $account->quotasize }}</td>
 					<td>{{ $account->username }}</td>
 
 					<td><span class="label label-primary">{{ Config::get('ftppanel.ftpHome') }}</span><span class="label label-success">{{ str_replace(Config::get('ftppanel.ftpHome'), '', $account->home) }}</span></td>
