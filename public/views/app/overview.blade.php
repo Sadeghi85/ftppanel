@@ -80,7 +80,7 @@
 			
 			<div class="row"><div class="col-md-22"><strong>Panel assigned disk space</strong></div><div class="col-md-50">
 			
-				{{ Libraries\Sadeghi85\Overview::getPanelTotalSpace() }} GB total, {{ Libraries\Sadeghi85\Overview::getPanelAssignedSpace() }} GB used
+				{{ Libraries\Sadeghi85\Overview::getPanelTotalSpace() }} GB free phisical space, {{ Libraries\Sadeghi85\Overview::getPanelAssignedSpace() }} GB panel assigned
 
 				<div class="progress" style="margin-bottom:0px;">
 					<div class="progress-bar progress-bar-danger" style="width:{{ Libraries\Sadeghi85\Overview::getPanelAssignedSpace() / Libraries\Sadeghi85\Overview::getPanelTotalSpace() * 100 }}%">
