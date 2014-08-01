@@ -20,6 +20,74 @@ Route::get('/', function()
 	return Redirect::to(Session::get('loginRedirect', route('overview.index')));
 });
 
+Route::post('upload', function()
+{
+	$response = array(
+		'success' => 0,
+		'video'   => '',
+		'thumb'   => '',
+		'preview' => ''
+	);
+	
+	$hasVideo   = (Input::hasFile('cdn_video')   and Input::file('cdn_video')->isValid())   ? true : false;
+	$hasThumb   = (Input::hasFile('cdn_thumb')   and Input::file('cdn_thumb')->isValid())   ? true : false;
+	$hasPreview = (Input::hasFile('cdn_preview') and Input::file('cdn_preview')->isValid()) ? true : false;
+	
+	if ($hasVideo) {
+		$localVideo = Input::file('cdn_video')->getRealPath();
+		$remoteVideo = Input::file('cdn_video')->getClientOriginalName();
+	} else {
+		return json_encode($response);
+	}
+	if ($hasThumb) {
+		$localThumb = Input::file('cdn_thumb')->getRealPath();
+		$remoteThumb = Input::file('cdn_thumb')->getClientOriginalName();
+	}
+	if ($hasPreview) {
+		$localPreview = Input::file('cdn_preview')->getRealPath();
+		$remotePreview = Input::file('cdn_preview')->getClientOriginalName();
+	}
+	
+	$username = Input::get('cdn_username', '');
+	$password = Input::get('cdn_password', '');
+	
+	$account = Account::where('username', $username)->where('password', sha1($password));
+	if ($account) {
+		// order of these two lines is important
+		$domain = $account->first()->aliases[0]->domain;
+		$home = str_replace(Config::get('ftppanel.ftpHome'), '', $account->pluck('home'));
+	} else {
+		return json_encode($response);
+	}
+	
+	$dir = Input::get('category', '');
+	
+	if ($resFtp = @ftp_connect('localhost')) {
+		if (@ftp_login($resFtp, $username, $password)) {
+			if (@ftp_pasv($resFtp, true)) {
+				@ftp_raw($resFtp, 'OPTS UTF-8 ON');
+				@ftp_mkdir($resFtp, $dir);
+				if (@ftp_chdir($resFtp, $dir)) {
+					if ($hasVideo and @ftp_put($resFtp, $remoteVideo, $localVideo, FTP_BINARY)) {
+						$response['success']   = 1;
+						$response['video']     = sprintf('http://%s/%s/%s/%s', $domain, $home, $dir, $remoteVideo);
+					} else {
+						return json_encode($response);
+					}
+					if ($hasThumb and @ftp_put($resFtp, $remoteThumb, $localThumb, FTP_BINARY)) {
+						$response['thumb']     = sprintf('http://%s/%s/%s/%s', $domain, $home, $dir, $remoteThumb);
+					}
+					if ($hasPreview and @ftp_put($resFtp, $remotePreview, $localPreview, FTP_BINARY)) {
+						$response['preview']   = sprintf('http://%s/%s/%s/%s', $domain, $home, $dir, $remotePreview);
+					}
+				}
+			}
+		}
+	}
+	
+	return json_encode($response);
+});
+
 // Route::get('ser', array('as' => 'ser', function()
 // {
 	//$a = unserialize(PanelLog::find(7)->description);
@@ -53,7 +121,7 @@ Route::get('/uploadscript', function()
 		
 		foreach ($aliases as $alias)
 		{
-			$txtContent .= 'http://'.$alias.'/'.encodeURI($relativeFile)."\r\n";
+			$txtContent .= sprintf('http://%s/%s%s', $alias, $relativeFile, "\r\n");
 		}
 		
 		shell_exec(sprintf('echo "%s" | sudo tee "%s"', $txtContent, $file.'.txt'));

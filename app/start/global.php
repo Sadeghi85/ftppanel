@@ -268,3 +268,9 @@ View::composer(Paginator::getViewName(), function($view) {
 // To check if Views are run from inside the framework
 define('VIEW_IS_ALLOWED', true);
 
+
+header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Referer, User-Agent');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Origin: *');
+
+
