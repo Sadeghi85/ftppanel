@@ -60,7 +60,12 @@ Route::post('upload', function()
 		return json_encode($response);
 	}
 	
-	$dir = Input::get('category', '');
+	if (Input::has('categoryslugs') and Input::has('category')) {
+		$categorySlugs = json_decode(base64_decode(Input::get('categoryslugs')), true);
+		$dir = $categorySlugs[Input::get('category')];
+	} else {
+		$dir = Input::get('category', '');
+	}
 	
 	if ($resFtp = @ftp_connect('localhost')) {
 		if (@ftp_login($resFtp, $username, $password)) {
