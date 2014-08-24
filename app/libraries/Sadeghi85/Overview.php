@@ -84,13 +84,14 @@ class Overview {
 	public static function getPanelTotalSpace()
 	{
 		self::_diskInfo();
-
+		
+		$usedSpace = preg_replace('#.*?total\s*\d+\s*(\d+).*#is', '$1', self::$_diskInfo);
 		$totalSpace = preg_replace('#.*?total\s*(\d+).*#is', '$1', self::$_diskInfo);
 		
 		$cdnSpace = shell_exec('sudo du -ck --max-depth=1 ' . Config::get('ftppanel.ftpHome'));
 		$cdnSpace = preg_replace('#.*?(\d+)\s*total.*#is', '$1', $cdnSpace);
 		
-		return sprintf('%01.2f', (($totalSpace - $cdnSpace) / (1024 * 1024)));
+		return sprintf('%01.2f', (($totalSpace - ($usedSpace - $cdnSpace)) / (1024 * 1024)));
 	}
 
 	public static function getPanelAssignedSpace()
