@@ -80,6 +80,14 @@ class Overview {
 
 		return $usedSpace;
 	}
+	
+	public static function getDirSpace($dir)
+	{
+		$dirSpace = shell_exec('sudo du -ck --max-depth=1 ' . $dir);
+		$dirSpace = preg_replace('#.*?(\d+)\s*total.*#is', '$1', $dirSpace);
+		
+		return sprintf('%01.2f', $dirSpace / 1024);
+	}
 
 	public static function getPanelTotalSpace()
 	{
