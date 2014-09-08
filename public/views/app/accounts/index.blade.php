@@ -88,11 +88,14 @@
 					<td style="text-align: center;"><span class="glyphicon glyphicon-{{ ($account->readonly ? 'ok'
 					 : 'remove')
 					}}"></span></td>
-					<td style="text-align: center;">{{ $account->quotasize }} / {{ Libraries\Sadeghi85\Overview::getDirSpace($account->home) }} used
+					@php
+						$usedSpace = Libraries\Sadeghi85\Overview::getDirSpace($account->home);
+					@endphp
+					<td style="text-align: center;">{{ $account->quotasize }} / {{ $usedSpace }} used
 						<div class="progress" style="margin-bottom:0px;">
-							<div class="progress-bar progress-bar-danger" style="width:{{ Libraries\Sadeghi85\Overview::getDirSpace($account->home) / $account->quotasize * 100 }}%">
+							<div class="progress-bar progress-bar-danger" style="width:{{ $usedSpace / $account->quotasize * 100 }}%">
 							</div>
-							<div class="progress-bar progress-bar" style="width: {{ 100 - Libraries\Sadeghi85\Overview::getDirSpace($account->home) / $account->quotasize * 100 }}%">
+							<div class="progress-bar progress-bar" style="width: {{ 100 - $usedSpace / $account->quotasize * 100 }}%">
 							</div>
 						</div>
 					

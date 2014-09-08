@@ -28,24 +28,24 @@
 		<div class="panel panel-primary" style="line-height: 28px;">
 		<div class="panel-body">
 			
-			<div class="row"><div class="col-md-22"><strong>System hostname</strong></div><div class="col-md-50">{{ Libraries\Sadeghi85\Overview::getHostname() }}</div></div>
+			<div class="row"><div class="col-md-22"><strong>System hostname</strong></div><div class="col-md-50">{{ $hostName }}</div></div>
 		
-			<div class="row"><div class="col-md-22"><strong>Operating system</strong></div><div class="col-md-50">{{ Libraries\Sadeghi85\Overview::getOperatingSystem() }}</div></div>
+			<div class="row"><div class="col-md-22"><strong>Operating system</strong></div><div class="col-md-50">{{ $OS }}</div></div>
 			
-			<div class="row"><div class="col-md-22"><strong>Time on system</strong></div><div class="col-md-50">{{ Libraries\Sadeghi85\Overview::getTime() }}</div></div>
+			<div class="row"><div class="col-md-22"><strong>Time on system</strong></div><div class="col-md-50">{{ $systemTime }}</div></div>
 			
-			<div class="row"><div class="col-md-22"><strong>System uptime</strong></div><div class="col-md-50">{{ Libraries\Sadeghi85\Overview::getUptime() }}</div></div>
+			<div class="row"><div class="col-md-22"><strong>System uptime</strong></div><div class="col-md-50">{{ $uptime }}</div></div>
 			
-			<div class="row"><div class="col-md-22"><strong>CPU load averages</strong></div><div class="col-md-50">{{ Libraries\Sadeghi85\Overview::getLoadAverages() }}</div></div>
+			<div class="row"><div class="col-md-22"><strong>CPU load averages</strong></div><div class="col-md-50">{{ $loadAverage }}</div></div>
 			
 			<div class="row"><div class="col-md-22"><strong>Real memory</strong></div><div class="col-md-50">
 			
-				{{ Libraries\Sadeghi85\Overview::getTotalMemory() }} MB total, {{ Libraries\Sadeghi85\Overview::getUsedMemory() }} MB used
+				{{ $totalMemory }} MB total, {{ $usedMemory }} MB used
 
 				<div class="progress" style="margin-bottom:0px;">
-					<div class="progress-bar progress-bar-danger" style="width:{{ Libraries\Sadeghi85\Overview::getUsedMemory() / Libraries\Sadeghi85\Overview::getTotalMemory() * 100 }}%">
+					<div class="progress-bar progress-bar-danger" style="width:{{ $usedMemory / $totalMemory * 100 }}%">
 					</div>
-					<div class="progress-bar progress-bar" style="width: {{ 100 - Libraries\Sadeghi85\Overview::getUsedMemory() / Libraries\Sadeghi85\Overview::getTotalMemory() * 100 }}%">
+					<div class="progress-bar progress-bar" style="width: {{ 100 - $usedMemory / $totalMemory * 100 }}%">
 					</div>
 				</div>
 
@@ -53,12 +53,12 @@
 			
 			<div class="row"><div class="col-md-22"><strong>Virtual memory</strong></div><div class="col-md-50">
 			
-				{{ Libraries\Sadeghi85\Overview::getTotalSwap() }} MB total, {{ Libraries\Sadeghi85\Overview::getUsedSwap() }} MB used
+				{{ $totalSwap }} MB total, {{ $usedSwap }} MB used
 
 				<div class="progress" style="margin-bottom:0px;">
-					<div class="progress-bar progress-bar-danger" style="width:{{ Libraries\Sadeghi85\Overview::getUsedSwap() / Libraries\Sadeghi85\Overview::getTotalSwap() * 100 }}%">
+					<div class="progress-bar progress-bar-danger" style="width:{{ $usedSwap / $totalSwap * 100 }}%">
 					</div>
-					<div class="progress-bar progress-bar" style="width: {{ 100 - Libraries\Sadeghi85\Overview::getUsedSwap() / Libraries\Sadeghi85\Overview::getTotalSwap() * 100 }}%">
+					<div class="progress-bar progress-bar" style="width: {{ 100 - $usedSwap / $totalSwap * 100 }}%">
 					</div>
 				</div>
 
@@ -67,12 +67,12 @@
 			
 			<div class="row"><div class="col-md-22"><strong>Local disk space</strong></div><div class="col-md-50">
 			
-				{{ Libraries\Sadeghi85\Overview::getTotalSpace() }} GB total, {{ Libraries\Sadeghi85\Overview::getUsedSpace() }} GB used
+				{{ $totalSpace }} GB total, {{ $usedSpace }} GB used
 
 				<div class="progress" style="margin-bottom:0px;">
-					<div class="progress-bar progress-bar-danger" style="width:{{ Libraries\Sadeghi85\Overview::getUsedSpace() / Libraries\Sadeghi85\Overview::getTotalSpace() * 100 }}%">
+					<div class="progress-bar progress-bar-danger" style="width:{{ $usedSpace / $totalSpace * 100 }}%">
 					</div>
-					<div class="progress-bar progress-bar" style="width: {{ 100 - Libraries\Sadeghi85\Overview::getUsedSpace() / Libraries\Sadeghi85\Overview::getTotalSpace() * 100 }}%">
+					<div class="progress-bar progress-bar" style="width: {{ 100 - $usedSpace / $totalSpace * 100 }}%">
 					</div>
 				</div>
 
@@ -80,12 +80,12 @@
 			
 			<div class="row"><div class="col-md-22"><strong>Panel assigned disk space</strong></div><div class="col-md-50">
 			
-				{{ Libraries\Sadeghi85\Overview::getPanelTotalSpace() }} GB panel usable physical space, {{ Libraries\Sadeghi85\Overview::getPanelAssignedSpace() }} GB panel assigned
+				{{ $totalPanelSpace }} GB panel usable physical space, {{ $assignedPanelSpace }} GB panel assigned
 
 				<div class="progress" style="margin-bottom:0px;">
-					<div class="progress-bar progress-bar-danger" style="width:{{ Libraries\Sadeghi85\Overview::getPanelAssignedSpace() / Libraries\Sadeghi85\Overview::getPanelTotalSpace() * 100 }}%">
+					<div class="progress-bar progress-bar-danger" style="width:{{ $assignedPanelSpace / $totalPanelSpace * 100 }}%">
 					</div>
-					<div class="progress-bar progress-bar" style="width: {{ 100 - Libraries\Sadeghi85\Overview::getPanelAssignedSpace() / Libraries\Sadeghi85\Overview::getPanelTotalSpace() * 100 }}%">
+					<div class="progress-bar progress-bar" style="width: {{ 100 - $assignedPanelSpace / $totalPanelSpace * 100 }}%">
 					</div>
 				</div>
 
