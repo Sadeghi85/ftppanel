@@ -115,7 +115,7 @@ Route::get('/uploadscript', function()
 		$aliases = array();
 		$txtContent = '';
 		
-		$accountsWithSameTopLevelDir = Account::where('home', 'LIKE', $topDir.'%');
+		$accountsWithSameTopLevelDir = Account::where('home', 'LIKE', $topDir.'/%')->orWhere('home', '=', $topDir);
 		
 		$accountsWithSameTopLevelDir->get()->each(function($account) use (&$aliases)
 		{
@@ -135,6 +135,14 @@ Route::get('/uploadscript', function()
 		
 		if ( ! empty($sharedHome))
 		{
+			$accounts = $accountsWithSameTopLevelDir->get();
+			
+			foreach ($accounts as $_account)
+			{
+				$_account->readonly = 1;
+				$_account->save();
+			}
+			
 			Event::fire('account.readonly_upload', array($topDir));
 		}
 	}

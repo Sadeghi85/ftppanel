@@ -117,6 +117,8 @@ class Account extends Eloquent {
 		$inputs['activated'] = (int) Input::get('activated', 0);
 		$inputs['comment'] = Input::get('comment', '');
 		
+		Event::fire('account.create_home', array($inputs['home']));
+		
 		try
 		{
 			foreach ($inputs as $column => $value)
@@ -142,17 +144,25 @@ class Account extends Eloquent {
 			
 		if ($inputs['readonly'])
 		{
+			$accounts = Account::where('home', 'LIKE', $topDir.'/%')->orWhere('home', '=', $topDir)->get();
+			foreach ($accounts as $_account)
+			{
+				$_account->readonly = 1;
+				$_account->save();
+			}
+			
 			Event::fire('account.readonly_upload', array($topDir));
 		}
 		else
 		{
-			
-			$sharedHome = Account::where('home', 'LIKE', $topDir.'%')->where('readonly', '=', 1)->lists('username');
-
-			if (empty($sharedHome))
+			$accounts = Account::where('home', 'LIKE', $topDir.'/%')->orWhere('home', '=', $topDir)->get();
+			foreach ($accounts as $_account)
 			{
-				Event::fire('account.normal_upload', array($topDir));
+				$_account->readonly = 0;
+				$_account->save();
 			}
+
+			Event::fire('account.normal_upload', array($topDir));
 		}
 
 		return true;

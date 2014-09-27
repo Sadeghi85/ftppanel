@@ -99,7 +99,10 @@ class Overview {
 		$cdnSpace = shell_exec('sudo du -ck --max-depth=1 ' . Config::get('ftppanel.ftpHome'));
 		$cdnSpace = preg_replace('#.*?(\d+)\s*total.*#is', '$1', $cdnSpace);
 		
-		return sprintf('%01.2f', (($totalSpace - ($usedSpace - $cdnSpace)) / (1024 * 1024)));
+		$totalPanelSpace = sprintf('%01.2f', (($totalSpace - ($usedSpace - $cdnSpace)) / (1024 * 1024)));
+		//$totalPanelSpace = ($totalPanelSpace == 0) ? 1 : $totalPanelSpace ;
+		
+		return $totalPanelSpace;
 	}
 
 	public static function getPanelAssignedSpace()
@@ -116,6 +119,7 @@ class Overview {
 
 		$totalMem = preg_replace('#.*?MemTotal:\s*(\d+).*#is', '$1', self::$_memInfo);
 		$totalMem = sprintf('%01.2f', ($totalMem / 1024));
+		//$totalMem = ($totalMem == 0) ? 1 : $totalMem ;
 		
 		return $totalMem;
 	}
@@ -141,23 +145,24 @@ class Overview {
 	{
 		self::_memInfo();
 
-		$totalMem = preg_replace('#.*?SwapTotal:\s*(\d+).*#is', '$1', self::$_memInfo);
-		$totalMem = sprintf('%01.2f', ($totalMem / 1024));
+		$totalSwap = preg_replace('#.*?SwapTotal:\s*(\d+).*#is', '$1', self::$_memInfo);
+		$totalSwap = sprintf('%01.2f', ($totalSwap / 1024));
+		//$totalSwap = ($totalSwap == 0) ? 1 : $totalSwap ;
 		
-		return $totalMem;
+		return $totalSwap;
 	}
 
 	public static function getUsedSwap()
 	{
 		self::_memInfo();
 
-		$totalMem = preg_replace('#.*?SwapTotal:\s*(\d+).*#is', '$1', self::$_memInfo);
-		//$totalMem = sprintf('%01.2f', ($totalMem / 1024));
+		$totalSwap = preg_replace('#.*?SwapTotal:\s*(\d+).*#is', '$1', self::$_memInfo);
+		//$totalSwap = sprintf('%01.2f', ($totalSwap / 1024));
 		
-		$freeMem = preg_replace('#.*?SwapFree:\s*(\d+).*#is', '$1', self::$_memInfo);
-		//$freeMem = sprintf('%01.2f', ($freeMem / 1024));
+		$freeSwap = preg_replace('#.*?SwapFree:\s*(\d+).*#is', '$1', self::$_memInfo);
+		//$freeSwap = sprintf('%01.2f', ($freeSwap / 1024));
 		
-		return sprintf('%01.2f', ($totalMem - $freeMem) / 1024);
+		return sprintf('%01.2f', ($totalSwap - $freeSwap) / 1024);
 	}
 
 }

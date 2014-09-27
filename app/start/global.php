@@ -215,12 +215,17 @@ Blade::extend(function($value)
 Event::listen('account.readonly_upload', function($dir)
 {
     Libraries\Sadeghi85\UploadScript::setReadonly($dir);
-});
+}, 1);
 
 Event::listen('account.normal_upload', function($dir)
 {
     Libraries\Sadeghi85\UploadScript::unsetReadonly($dir);
-});
+}, 1);
+
+Event::listen('account.create_home', function($dir)
+{
+    Libraries\Sadeghi85\UploadScript::createHome($dir);
+}, 2);
 
 /*
 |--------------------------

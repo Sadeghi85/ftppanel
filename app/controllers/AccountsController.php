@@ -97,7 +97,7 @@ class AccountsController extends AuthorizedController {
 		Input::merge(array(
 			'home' => strtolower(trim(trim(str_replace('\\', '/', Input::get('home'))),	'/')),
 			'ip'   => implode("\r\n", array_unique(array_filter(array_map('trim', explode("\r\n",str_replace(' ', '', Input::get('ip'))))))),
-			'aliases' => implode("\r\n", array_unique(array_filter(array_map('trim', explode("\r\n",preg_replace('#(?:^|\r\n)([^/]*)/.*#', '$1', str_replace(array(' ', 'http://', 'https://'), '', strtolower(Input::get('aliases'))))))))),
+			'aliases' => implode("\r\n", array_unique(array_filter(array_map('trim', explode("\r\n",preg_replace('#(?:^|\r\n)([^/]*)/.*#', '$1', str_replace(array(' ', 'http://', 'https://'), '', strtolower(Input::get('aliases')."\r\n".Config::get('ftppanel.ftpDefaultDomain'))))))))),
 		));
 
 		$accountInstance = new Account;
@@ -165,7 +165,7 @@ class AccountsController extends AuthorizedController {
 		}
 
 		$topDir = Libraries\Sadeghi85\UploadScript::getTopDir($account->home)['topDir'];
-		$sharedHome = Account::where('home', 'LIKE', $topDir.'%')->lists('username');
+		$sharedHome = Account::where('home', 'LIKE', $topDir.'/%')->orWhere('home', '=', $topDir)->lists('username');
 		$sharedHome = array_diff($sharedHome, array($account->username));
 
 		// Show the page

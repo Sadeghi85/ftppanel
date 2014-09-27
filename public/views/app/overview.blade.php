@@ -42,12 +42,14 @@
 			
 				{{ $totalMemory }} MB total, {{ $usedMemory }} MB used
 
+				@if ($totalMemory > 0)
 				<div class="progress" style="margin-bottom:0px;">
 					<div class="progress-bar progress-bar-danger" style="width:{{ $usedMemory / $totalMemory * 100 }}%">
 					</div>
 					<div class="progress-bar progress-bar" style="width: {{ 100 - $usedMemory / $totalMemory * 100 }}%">
 					</div>
 				</div>
+				@endif
 
 			</div></div>
 			
@@ -55,12 +57,14 @@
 			
 				{{ $totalSwap }} MB total, {{ $usedSwap }} MB used
 
+				@if ($totalSwap > 0)
 				<div class="progress" style="margin-bottom:0px;">
 					<div class="progress-bar progress-bar-danger" style="width:{{ $usedSwap / $totalSwap * 100 }}%">
 					</div>
 					<div class="progress-bar progress-bar" style="width: {{ 100 - $usedSwap / $totalSwap * 100 }}%">
 					</div>
 				</div>
+				@endif
 
 			</div></div>
 			
@@ -69,12 +73,14 @@
 			
 				{{ $totalSpace }} GB total, {{ $usedSpace }} GB used
 
+				@if ($totalSpace > 0)
 				<div class="progress" style="margin-bottom:0px;">
 					<div class="progress-bar progress-bar-danger" style="width:{{ $usedSpace / $totalSpace * 100 }}%">
 					</div>
 					<div class="progress-bar progress-bar" style="width: {{ 100 - $usedSpace / $totalSpace * 100 }}%">
 					</div>
 				</div>
+				@endif
 
 			</div></div>
 			
@@ -82,12 +88,14 @@
 			
 				{{ $totalPanelSpace }} GB panel usable physical space, {{ $assignedPanelSpace }} GB panel assigned
 
+				@if ($totalPanelSpace > 0)
 				<div class="progress" style="margin-bottom:0px;">
 					<div class="progress-bar progress-bar-danger" style="width:{{ $assignedPanelSpace / $totalPanelSpace * 100 }}%">
 					</div>
 					<div class="progress-bar progress-bar" style="width: {{ 100 - $assignedPanelSpace / $totalPanelSpace * 100 }}%">
 					</div>
 				</div>
+				@endif
 
 			</div></div>
 			

@@ -92,13 +92,14 @@
 						$usedSpace = Libraries\Sadeghi85\Overview::getDirSpace($account->home);
 					@endphp
 					<td style="text-align: center;">{{ $account->quotasize }} / {{ $usedSpace }} used
+						@if ($account->quotasize > 0)
 						<div class="progress" style="margin-bottom:0px;">
 							<div class="progress-bar progress-bar-danger" style="width:{{ $usedSpace / $account->quotasize * 100 }}%">
 							</div>
 							<div class="progress-bar progress-bar" style="width: {{ 100 - $usedSpace / $account->quotasize * 100 }}%">
 							</div>
 						</div>
-					
+						@endif
 					
 					</td>
 					<td>{{ $account->username }}</td>
