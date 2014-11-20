@@ -10,7 +10,7 @@ class UploadScript {
 		$nginxConfig = shell_exec("sudo cat /etc/nginx/nginx.conf 2>/dev/null");
 		
 		$nginxConfig = preg_replace('#[\r\n]+\s*location\s*'.($dir).'/\s*{\s*return\s*444;\s*}#i', '', $nginxConfig);
-		$nginxConfig = preg_replace('#[\r\n]+\s*server\s*{#i', "\r\n\tserver {\r\n\t\tlocation $dir/ { return 444; }", $nginxConfig);
+		$nginxConfig = preg_replace('#[\r\n]+\s*server\s*{#i', "\n    server {\n        location $dir/ { return 444; }", $nginxConfig);
 		
 		shell_exec("sudo \cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak 2>/dev/null");
 		
