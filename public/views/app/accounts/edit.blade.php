@@ -228,6 +228,36 @@
 					</div>
 				</div>
 
+				<!-- Http -->
+				<div class="form-group {{ $errors->has('http') ? 'has-error' : '' }}">
+					{{ Form::label('http', Lang::get('accounts/messages.edit.http'),
+					array('class' => 'control-label col-md-12')) }}
+					<div class="col-md-12">
+						{{ Form::select('http', array('0'=>Lang::get('general.no'),'1'=>Lang::get('general.yes')), Input::old('http', $account->http), array('class'=>'form-control')) }}
+					</div>
+					<div class="col-md-6">
+						<label class="control-label"></label>
+					</div>
+					<div class="col-md-24">
+						<span class="help-block">{{ $errors->first('http') }}</span>
+					</div>
+				</div>
+				
+				<!-- Text File -->
+				<div class="form-group {{ $errors->has('textfile') ? 'has-error' : '' }}">
+					{{ Form::label('textfile', Lang::get('accounts/messages.edit.textfile'),
+					array('class' => 'control-label col-md-12')) }}
+					<div class="col-md-12">
+						{{ Form::select('textfile', array('0'=>Lang::get('general.no'),'1'=>Lang::get('general.yes')), Input::old('textfile', $account->textfile), array('class'=>'form-control')) }}
+					</div>
+					<div class="col-md-6">
+						<label class="control-label"></label>
+					</div>
+					<div class="col-md-24">
+						<span class="help-block">{{ $errors->first('textfile') }}</span>
+					</div>
+				</div>
+
 				<!-- Read-only Upload -->
 				<div class="form-group {{ $errors->has('readonly') ? 'has-error' : '' }}">
 					{{ Form::label('readonly', Lang::get('accounts/messages.edit.readonly'),

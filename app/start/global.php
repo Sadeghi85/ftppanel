@@ -212,6 +212,16 @@ Blade::extend(function($value)
 |--------------------------
 */
 
+Event::listen('account.disable_http', function($dir)
+{
+    Libraries\Sadeghi85\UploadScript::disableHttp($dir);
+}, 1);
+
+Event::listen('account.enable_http', function($dir)
+{
+    Libraries\Sadeghi85\UploadScript::enableHttp($dir);
+}, 1);
+
 Event::listen('account.readonly_upload', function($dir)
 {
     Libraries\Sadeghi85\UploadScript::setReadonly($dir);

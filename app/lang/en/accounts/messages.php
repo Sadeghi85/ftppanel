@@ -84,6 +84,8 @@ return array(
 		'quotafiles' => 'Quota Files',
 		'readonly' => 'Read-only Upload',
 		'activated' => 'Activate',
+		'http' => 'Http',
+		'textfile' => 'Text File',
 		'users' => 'Users',
 		
 	),
@@ -107,6 +109,8 @@ return array(
 		'quotasize' => 'Quota Size',
 		'quotafiles' => 'Quota Files',
 		'readonly' => 'Read-only Upload',
+		'http' => 'Http',
+		'textfile' => 'Text File',
 		'activated' => 'Activate',
 		'users' => 'Users',
 		

@@ -113,12 +113,14 @@ Route::get('/uploadscript', function()
 		$relativeFile = Libraries\Sadeghi85\UploadScript::getTopDir($file)['relativeFile'];
 
 		$aliases = array();
+		$textFile = true;
 		$txtContent = '';
 		
 		$accountsWithSameTopLevelDir = Account::where('home', 'LIKE', $topDir.'/%')->orWhere('home', '=', $topDir);
 		
-		$accountsWithSameTopLevelDir->get()->each(function($account) use (&$aliases)
+		$accountsWithSameTopLevelDir->get()->each(function($account) use (&$aliases, &$textFile)
 		{
+			if ( ! $account->textfile) { $textFile = false; }
 			$aliases = array_merge($aliases, $account->aliases()->lists('domain'));
 		});
 		
@@ -129,7 +131,10 @@ Route::get('/uploadscript', function()
 			$txtContent .= sprintf('http://%s/%s%s', $alias, $relativeFile, "\r\n");
 		}
 		
-		shell_exec(sprintf('echo "%s" | sudo tee "%s"', $txtContent, $file.'.txt'));
+		if ($textFile)
+		{
+			shell_exec(sprintf('echo "%s" | sudo tee "%s"', $txtContent, $file.'.txt'));
+		}
 		
 		$sharedHome = $accountsWithSameTopLevelDir->where('readonly', '=', 1)->lists('username');
 		

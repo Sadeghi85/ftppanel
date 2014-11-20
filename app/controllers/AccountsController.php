@@ -98,6 +98,7 @@ class AccountsController extends AuthorizedController {
 			'home' => strtolower(trim(trim(str_replace('\\', '/', Input::get('home'))),	'/')),
 			'ip'   => implode("\r\n", array_unique(array_filter(array_map('trim', explode("\r\n",str_replace(' ', '', Input::get('ip'))))))),
 			'aliases' => implode("\r\n", array_unique(array_filter(array_map('trim', explode("\r\n",preg_replace('#(?:^|\r\n)([^/]*)/.*#', '$1', str_replace(array(' ', 'http://', 'https://'), '', strtolower(Input::get('aliases')."\r\n".Config::get('ftppanel.ftpDefaultDomain'))))))))),
+			'textfile' => ((int) Input::get('http', 1) ? (int) Input::get('textfile', 1) : 0),
 		));
 
 		$accountInstance = new Account;

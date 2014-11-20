@@ -114,6 +114,8 @@ class Account extends Eloquent {
 		$inputs = array_filter(Input::only('username', 'ulbandwidth', 'dlbandwidth', 'quotasize', 'quotafiles'));
 		$inputs['home'] = Config::get('ftppanel.ftpHome').'/'.Input::get('home');
 		$inputs['readonly'] = (int) Input::get('readonly', 1);
+		$inputs['http'] = (int) Input::get('http', 1);
+		$inputs['textfile'] = (int) Input::get('textfile', 1);
 		$inputs['activated'] = (int) Input::get('activated', 0);
 		$inputs['comment'] = Input::get('comment', '');
 		
@@ -140,8 +142,19 @@ class Account extends Eloquent {
 			return false;
 		}
 		
-		$topDir = Libraries\Sadeghi85\UploadScript::getTopDir($inputs['home'])['topDir'];
-			
+		$_topDir = Libraries\Sadeghi85\UploadScript::getTopDir($inputs['home']);
+		$relativeTopDir = $_topDir['relativeTopDir'];
+		$topDir = $_topDir['topDir'];
+		
+		if ($inputs['http'])
+		{
+			Event::fire('account.enable_http', array($relativeTopDir));
+		}
+		else
+		{
+			Event::fire('account.disable_http', array($relativeTopDir));
+		}
+		
 		if ($inputs['readonly'])
 		{
 			$accounts = Account::where('home', 'LIKE', $topDir.'/%')->orWhere('home', '=', $topDir)->get();
